@@ -41,7 +41,7 @@ export default function GalleryGrid({
         ))}
       </div>
 
-      <div className="mt-8 grid grid-cols-2 gap-x-5 gap-y-9 sm:grid-cols-3 lg:grid-cols-4">
+      <div className="mt-8 grid grid-cols-2 gap-x-6 gap-y-12 lg:grid-cols-3">
         {filtered.map((art, i) => (
           <ArtworkCard
             key={art.id}

@@ -16,7 +16,7 @@ export default function ShopPage() {
         title="Own a piece of art"
         description="Prints and original artworks available. Message on WhatsApp to check availability and arrange delivery."
       />
-      <div className="mt-10 grid grid-cols-2 gap-x-5 gap-y-9 sm:grid-cols-3 lg:grid-cols-4">
+      <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-12 lg:grid-cols-3">
         {shopArtworks.map((art, i) => (
           <ArtworkCard
             key={art.id}

@@ -10,7 +10,7 @@ import HeroIntro from "@/components/HeroIntro";
 import SpinImageOrbit from "@/components/SpinImageOrbit";
 import { whatsappLink, generalEnquiryMessage } from "@/lib/whatsapp";
 
-const featured = galleryArtworks.slice(0, 8);
+const featured = galleryArtworks.slice(0, 6);
 const heroRingImages = galleryArtworks.slice(0, 9).map((a) => a.imageUrl);
 const philosophy = artist.bio
   .split("\n")
@@ -74,7 +74,7 @@ export default function Home() {
             description="A glimpse into recent paintings, portraits and commissions."
           />
         </Reveal>
-        <div className="mt-10 grid grid-cols-2 gap-x-5 gap-y-9 sm:grid-cols-4">
+        <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-12 lg:grid-cols-3">
           {featured.map((art, i) => (
             <ArtworkCard
               key={art.id}

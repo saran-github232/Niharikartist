@@ -68,7 +68,7 @@ export default function ArtworkCard({
             src={imageUrl}
             alt={title}
             fill
-            sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
+            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
             priority={priority}
             className="object-cover"
           />
