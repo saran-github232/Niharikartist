@@ -50,10 +50,26 @@ again unless you're re-importing from that source.
   mail server-side, so the form validates client-side and opens the visitor's email
   client pre-filled to `niharikaananthoja@gmail.com`. WhatsApp is offered as the
   faster alternative alongside it.
-- **Images are served unoptimized** (`next.config.ts`) — they're hotlinked from
-  ibb.co, a free image host that times out under Next's server-side re-fetch/resize.
-  If this ever needs real optimization, migrate the images to proper storage
-  (Cloudinary, Vercel Blob, S3) first, then flip `images.unoptimized` off.
+- **Images route through a custom loader** (`src/lib/image-loader.ts`) instead of
+  Next's built-in optimizer. The source photos are un-resized phone uploads
+  (1-2MB+) hotlinked from ibb.co, and Next's own server-side fetch/resize times
+  out against that host. The custom loader proxies through wsrv.nl (a resizing
+  image CDN) instead — real byte savings (~98% smaller) without Next ever making
+  the flaky request itself. If this ever needs to change, migrate the source
+  images to real storage (Cloudinary, Vercel Blob, S3) and switch back to
+  Next's default loader.
+- **3D/animation stack:** GSAP (`ScrollTrigger` for scroll reveals, a 3D-flip
+  lightbox transition, hero text stagger) and `@react-three/fiber` + `drei` for
+  the hero's floating gallery-ring (real artwork as textured planes, auto-
+  rotating with mouse parallax). The WebGL scene is dynamically imported
+  (`ssr: false`) and skipped outright on mobile, no-WebGL, and
+  `prefers-reduced-motion` — the static hero photo underneath is a complete
+  hero on its own, so nothing is lost when it's skipped. `useTilt3D`
+  (`src/lib/useTilt3D.ts`) adds a cheap CSS-3D hover tilt to artwork/category
+  cards site-wide without any WebGL cost.
+  - Gotcha worth knowing if you touch `GalleryRing.tsx`: drei's `<Image>`
+    suspends on texture load, so each plane needs its own `<Suspense>`
+    boundary or the whole ring silently fails to render.
 - **`contactMessages`** in the original site's data (real customer emails/enquiries)
   was deliberately not carried over anywhere — it's private correspondence, not
   site content.
@@ -69,5 +85,7 @@ with static export hosting since every route is static except `/gallery` (uses
 
 Production build, ESLint, and a headless-browser pass across every route: nav
 (desktop + mobile menu, scroll-lock, close-on-navigate), gallery category filter,
-lightbox (open/arrow-key nav/Escape), shop detail pages, contact form validation,
-404 page, and console/network error checks. All clean.
+lightbox (open/arrow-key nav/Escape/3D-flip transition), shop detail pages,
+contact form validation, 404 page, the hero's 3D scene (renders, skips
+correctly on mobile/reduced-motion), and console/network error checks. All
+clean.
