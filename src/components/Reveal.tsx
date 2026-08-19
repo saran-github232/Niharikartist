@@ -2,9 +2,7 @@
 
 import { useEffect, useRef, type ReactNode } from "react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-let pluginRegistered = false;
+import { ensureScrollTrigger } from "@/lib/scrollTrigger";
 
 export default function Reveal({
   children,
@@ -23,22 +21,21 @@ export default function Reveal({
     // confirmed running, so no-JS clients and crawlers always see full content.
     if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    if (!pluginRegistered) {
-      gsap.registerPlugin(ScrollTrigger);
-      pluginRegistered = true;
-    }
+    ensureScrollTrigger();
 
     const ctx = gsap.context(() => {
       gsap.fromTo(
         el,
-        { opacity: 0, y: 24 },
+        { opacity: 0, y: 46, scale: 0.96, filter: "blur(10px)" },
         {
           opacity: 1,
           y: 0,
-          duration: 0.8,
+          scale: 1,
+          filter: "blur(0px)",
+          duration: 1.1,
           delay: delay / 1000,
-          ease: "power3.out",
-          scrollTrigger: { trigger: el, start: "top 90%", once: true },
+          ease: "power4.out",
+          scrollTrigger: { trigger: el, start: "top 88%", once: true },
         }
       );
     });

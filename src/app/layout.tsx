@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
+import AmbientBackground from "@/components/AmbientBackground";
 import { artist } from "@/data/artist";
 import { siteConfig } from "@/data/siteConfig";
 
@@ -66,6 +67,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
         />
+        <AmbientBackground />
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />

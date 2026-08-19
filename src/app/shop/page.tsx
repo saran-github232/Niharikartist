@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { shopArtworks } from "@/data/shop";
 import ArtworkCard from "@/components/ArtworkCard";
 import SectionHeading from "@/components/SectionHeading";
-import Reveal from "@/components/Reveal";
 
 export const metadata: Metadata = {
   title: "Shop",
@@ -19,17 +18,16 @@ export default function ShopPage() {
       />
       <div className="mt-10 grid grid-cols-2 gap-x-5 gap-y-9 sm:grid-cols-3 lg:grid-cols-4">
         {shopArtworks.map((art, i) => (
-          <Reveal key={art.id} delay={(i % 8) * 40}>
-            <ArtworkCard
-              title={art.title}
-              subtitle={art.available ? undefined : "Sold"}
-              imageUrl={art.imageUrl}
-              href={`/shop/${art.slug}`}
-              price={art.price}
-              available={art.available}
-              priority={i < 4}
-            />
-          </Reveal>
+          <ArtworkCard
+            key={art.id}
+            title={art.title}
+            subtitle={art.available ? undefined : "Sold"}
+            imageUrl={art.imageUrl}
+            href={`/shop/${art.slug}`}
+            price={art.price}
+            available={art.available}
+            priority={i < 4}
+          />
         ))}
       </div>
     </div>

@@ -74,15 +74,14 @@ export default function Home() {
         </Reveal>
         <div className="mt-10 grid grid-cols-2 gap-x-5 gap-y-9 sm:grid-cols-4">
           {featured.map((art, i) => (
-            <Reveal key={art.id} delay={i * 60}>
-              <ArtworkCard
-                title={art.title}
-                subtitle={art.category}
-                imageUrl={art.imageUrl}
-                href={`/gallery#${art.slug}`}
-                priority={i < 4}
-              />
-            </Reveal>
+            <ArtworkCard
+              key={art.id}
+              title={art.title}
+              subtitle={art.category}
+              imageUrl={art.imageUrl}
+              href={`/gallery#${art.slug}`}
+              priority={i < 4}
+            />
           ))}
         </div>
         <Reveal>

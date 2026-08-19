@@ -40,7 +40,56 @@ body {
   color: var(--color-ivory);
 }
 
+/* Ambient backdrop: soft blurred color fields that drift slowly behind any
+   section that doesn't set its own solid background (most of the site —
+   sections with bg-paper/bg-charcoal simply paint over it, which is fine). */
+.ambient-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(80px);
+  will-change: transform;
+}
+.ambient-blob-1 {
+  top: -12rem;
+  left: -10rem;
+  width: 42rem;
+  height: 42rem;
+  background: radial-gradient(circle at 35% 35%, color-mix(in srgb, var(--color-accent) 30%, transparent), transparent 70%);
+  animation: driftA 34s ease-in-out infinite alternate;
+}
+.ambient-blob-2 {
+  bottom: -14rem;
+  right: -12rem;
+  width: 46rem;
+  height: 46rem;
+  background: radial-gradient(circle at 60% 40%, color-mix(in srgb, var(--color-sand) 70%, transparent), transparent 70%);
+  animation: driftB 40s ease-in-out infinite alternate;
+}
+.ambient-blob-3 {
+  top: 38%;
+  left: 52%;
+  width: 34rem;
+  height: 34rem;
+  background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--color-accent) 18%, transparent), transparent 70%);
+  animation: driftC 28s ease-in-out infinite alternate;
+}
+@keyframes driftA {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(5rem, 4rem) scale(1.15); }
+}
+@keyframes driftB {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(-4rem, -5rem) scale(1.1); }
+}
+@keyframes driftC {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(-3rem, 4rem) scale(0.9); }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .ambient-blob {
+    animation: none;
+  }
   * {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
