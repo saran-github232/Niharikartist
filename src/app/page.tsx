@@ -1,16 +1,21 @@
 import Link from "next/link";
 import { artist } from "@/data/artist";
 import { galleryArtworks, galleryCategories } from "@/data/gallery";
-import ArtworkCard from "@/components/ArtworkCard";
 import CategoryCard from "@/components/CategoryCard";
 import SectionHeading from "@/components/SectionHeading";
 import Reveal from "@/components/Reveal";
 import FadeImage from "@/components/FadeImage";
 import HeroIntro from "@/components/HeroIntro";
 import SpinImageOrbit from "@/components/SpinImageOrbit";
+import CoverflowCarousel, { type CoverflowItem } from "@/components/CoverflowCarousel";
 import { whatsappLink, generalEnquiryMessage } from "@/lib/whatsapp";
 
-const featured = galleryArtworks.slice(0, 6);
+const featured: CoverflowItem[] = galleryArtworks.slice(0, 8).map((a) => ({
+  src: a.imageUrl,
+  title: a.title,
+  subtitle: a.category,
+  href: `/gallery#${a.slug}`,
+}));
 const heroRingImages = galleryArtworks.slice(0, 9).map((a) => a.imageUrl);
 const philosophy = artist.bio
   .split("\n")
@@ -74,17 +79,8 @@ export default function Home() {
             description="A glimpse into recent paintings, portraits and commissions."
           />
         </Reveal>
-        <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-12 lg:grid-cols-3">
-          {featured.map((art, i) => (
-            <ArtworkCard
-              key={art.id}
-              title={art.title}
-              subtitle={art.category}
-              imageUrl={art.imageUrl}
-              href={`/gallery#${art.slug}`}
-              priority={i < 4}
-            />
-          ))}
+        <div className="mt-10">
+          <CoverflowCarousel items={featured} />
         </div>
         <Reveal>
           <div className="mt-12 text-center">

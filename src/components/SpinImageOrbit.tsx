@@ -64,9 +64,13 @@ export default function SpinImageOrbit({
 
   // Image chips scale with the measured container instead of a fixed px
   // size, so the orbit reads well from a small phone hero to a wide desktop one.
-  const imgSize = Math.max(64, Math.min(150, W * 0.14));
-  const radius = (ROUNDED / 20) * (imgSize / 2);
-  const textureSize = Math.round(imgSize * 2);
+  // Portrait aspect (not square): most of this artwork is a face-and-torso
+  // portrait, and a square crop centered on the whole image was cutting faces
+  // off. The extra height leaves room for a top-biased crop instead.
+  const imgW = Math.max(64, Math.min(150, W * 0.14));
+  const imgH = imgW * 1.25;
+  const radius = (ROUNDED / 20) * (Math.min(imgW, imgH) / 2);
+  const textureSize = Math.round(imgW * 2);
 
   const proxiedImages = useMemo(
     () => images.map((src) => imageLoader({ src, width: textureSize, quality: 70 })),
@@ -103,8 +107,8 @@ export default function SpinImageOrbit({
             const ey = b * Math.sin(phi);
             const x = ex * cosT - ey * sinT;
             const y = ex * sinT + ey * cosT;
-            const left = cx + x - imgSize / 2;
-            const top = cy + y - imgSize / 2;
+            const left = cx + x - imgW / 2;
+            const top = cy + y - imgH / 2;
             const depth = (Math.cos(phi) + 1) / 2;
             const scale = 0.6 + 0.8 * depth;
             const zIndex = Math.round(y);
@@ -115,15 +119,18 @@ export default function SpinImageOrbit({
                   position: "absolute",
                   left,
                   top,
-                  width: imgSize,
-                  height: imgSize,
+                  width: imgW,
+                  height: imgH,
                   transform: `rotateX(${Y_CURVE}deg) rotateY(${-X_CURVE}deg) scale(${scale})`,
                   zIndex,
                   borderRadius: radius,
                   overflow: "hidden",
                   backgroundImage: `url(${src})`,
                   backgroundSize: "cover",
-                  backgroundPosition: "center",
+                  // Biased toward the top: this artwork is mostly face-and-
+                  // torso portraits, and a dead-center crop tends to land on
+                  // the chest/neck instead of the face.
+                  backgroundPosition: "center 15%",
                   backgroundRepeat: "no-repeat",
                   boxShadow: "0 8px 24px rgba(22,19,15,0.28), 0 2px 6px rgba(22,19,15,0.18)",
                   willChange: "left, top, transform",
