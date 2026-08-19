@@ -141,7 +141,7 @@ export default function Home() {
             description="From graphite portraits to live wedding painting."
           />
         </Reveal>
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
           {galleryCategories.map((cat, i) => {
             const sample = galleryArtworks.find((a) => a.category === cat);
             if (!sample) return null;

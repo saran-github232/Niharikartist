@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { siteConfig, WHATSAPP_NUMBER } from "@/data/siteConfig";
 import { whatsappLink, generalEnquiryMessage } from "@/lib/whatsapp";
 import CartButton from "./CartButton";
+import ThemeToggle from "./ThemeToggle";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -69,6 +70,7 @@ export default function Navbar() {
             </Link>
           ))}
           <CartButton />
+          <ThemeToggle />
           {WHATSAPP_NUMBER && (
             <a
               href={whatsappLink(generalEnquiryMessage())}
@@ -113,7 +115,7 @@ export default function Navbar() {
 
       <div
         className={`overflow-hidden transition-[max-height] duration-300 ease-in-out md:hidden ${
-          open ? "max-h-96" : "max-h-0"
+          open ? "max-h-[32rem]" : "max-h-0"
         }`}
       >
         <nav className="flex flex-col gap-1 border-t border-sand/60 bg-ivory px-5 py-4">
@@ -128,11 +130,15 @@ export default function Navbar() {
               {item.label}
             </Link>
           ))}
+          <div className="mt-2 flex items-center justify-between px-3 py-2">
+            <span className="text-sm text-stone">Theme</span>
+            <ThemeToggle />
+          </div>
           <a
             href={whatsappLink(generalEnquiryMessage())}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-2 rounded-full bg-charcoal px-5 py-3 text-center text-base text-ivory"
+            className="mt-1 rounded-full bg-charcoal px-5 py-3 text-center text-base text-ivory"
           >
             Enquire on WhatsApp
           </a>

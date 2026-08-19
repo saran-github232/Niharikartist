@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 import AmbientBackground from "@/components/AmbientBackground";
+import ThemeProvider from "@/components/ThemeProvider";
 import { CartProvider } from "@/lib/cart";
 import CartDrawer from "@/components/CartDrawer";
 import CartToast from "@/components/CartToast";
@@ -63,6 +64,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${fraunces.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-ivory text-ink">
@@ -70,15 +72,17 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
         />
-        <CartProvider>
-          <AmbientBackground />
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Footer />
-          <FloatingWhatsApp />
-          <CartDrawer />
-          <CartToast />
-        </CartProvider>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <CartProvider>
+            <AmbientBackground />
+            <Navbar />
+            <main className="flex-1">{children}</main>
+            <Footer />
+            <FloatingWhatsApp />
+            <CartDrawer />
+            <CartToast />
+          </CartProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

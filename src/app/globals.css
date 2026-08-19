@@ -12,6 +12,26 @@
 
   --background: var(--color-ivory);
   --foreground: var(--color-ink);
+
+  color-scheme: light;
+}
+
+/* Dark theme: same token names, inverted values. Every component already
+   reads bg-ivory/text-ink/bg-charcoal/etc. via these vars, so redefining
+   them here is what makes the whole site adapt without touching component
+   files — including the light<->dark flip of "charcoal" (a dark fill in
+   light mode) so bg-charcoal buttons stay high-contrast in both themes. */
+:root.dark {
+  --color-ivory: #16130f;
+  --color-paper: #1f1a14;
+  --color-sand: #362d21;
+  --color-stone: #a89a80;
+  --color-charcoal: #f3ede2;
+  --color-ink: #f6f1e8;
+  --color-accent: #d9954a;
+  --color-accent-dark: #b56a2e;
+
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -27,6 +47,17 @@
   --color-foreground: var(--foreground);
   --font-serif: var(--font-fraunces), "Playfair Display", Georgia, serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* A few decorative elements (NeonBorder's glow especially) deliberately
+   bleed past their own box on purpose — fine on a wide desktop viewport,
+   but the same fixed-px bleed radius is huge relative to a narrow phone
+   screen and was widening the whole document into real horizontal scroll.
+   Both html and body need this: overflow-x on just one of them doesn't
+   reliably stop real scroll/wheel gestures on the root scrolling element. */
+html,
+body {
+  overflow-x: hidden;
 }
 
 body {
