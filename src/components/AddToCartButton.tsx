@@ -4,7 +4,7 @@ import { useCart } from "@/lib/cart";
 import type { ShopArtwork } from "@/data/shop";
 import { deriveAvailability } from "@/lib/availability";
 import { whatsappLink, singleArtworkEnquiryMessage, isWhatsAppConfigured } from "@/lib/whatsapp";
-import KeycapButton from "./originkit/ui/keycap-button";
+import CartIcon from "./CartIcon";
 import WhatsAppIcon from "./WhatsAppIcon";
 
 export default function AddToCartButton({
@@ -17,7 +17,8 @@ export default function AddToCartButton({
   const { isInCart, add, open } = useCart();
   const status = deriveAvailability(art.available);
   const inCart = isInCart(art.slug);
-  const padding = size === "sm" ? "9px 20px" : "12px 26px";
+  const sizeClasses = size === "sm" ? "px-3.5 py-1.5 text-xs" : "px-6 py-3 text-sm";
+  const iconSize = size === "sm" ? "size-3.5" : "size-4";
 
   if (status === "SOLD" || status === "RESERVED" || status === "COMING_SOON") {
     const label = status === "SOLD" ? "Sold" : status === "RESERVED" ? "Reserved" : "Coming Soon";
@@ -26,7 +27,7 @@ export default function AddToCartButton({
         type="button"
         disabled
         aria-disabled="true"
-        className="cursor-not-allowed rounded-full border border-stone/30 px-6 py-3 text-sm text-stone"
+        className={`cursor-not-allowed rounded-full border border-stone/30 text-stone ${sizeClasses}`}
       >
         {label}
       </button>
@@ -46,9 +47,9 @@ export default function AddToCartButton({
         href={whatsappLink(singleArtworkEnquiryMessage(art))}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex w-fit items-center gap-2 rounded-full bg-[#25D366] px-6 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90"
+        className={`flex w-fit items-center gap-2 rounded-full bg-[#25D366] font-medium text-white transition-opacity hover:opacity-90 ${sizeClasses}`}
       >
-        <WhatsAppIcon className="size-4" />
+        <WhatsAppIcon className={iconSize} />
         Enquire via WhatsApp
       </a>
     );
@@ -59,19 +60,23 @@ export default function AddToCartButton({
       <button
         type="button"
         onClick={open}
-        className="rounded-full border border-accent px-6 py-3 text-sm font-medium text-accent transition-colors hover:bg-accent hover:text-ivory"
+        className={`flex w-fit items-center gap-1.5 rounded-full border border-accent font-medium text-accent transition-colors hover:bg-accent hover:text-ivory ${sizeClasses}`}
       >
-        Added to Selection · View Selection
+        <CartIcon className={iconSize} />
+        Added · View
       </button>
     );
   }
 
   return (
-    <KeycapButton
-      label="Add to Cart"
-      padding={padding}
+    <button
+      type="button"
       onClick={() => add(art.slug)}
-      ariaLabel={`Add ${art.title} to your selection`}
-    />
+      aria-label={`Add ${art.title} to your selection`}
+      className={`flex w-fit items-center gap-1.5 rounded-full bg-charcoal font-medium text-ivory transition-colors hover:bg-accent ${sizeClasses}`}
+    >
+      <CartIcon className={iconSize} />
+      Add to Cart
+    </button>
   );
 }

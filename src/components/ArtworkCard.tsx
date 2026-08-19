@@ -76,7 +76,7 @@ export default function ArtworkCard({
           fill
           sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
           priority={priority}
-          className="object-cover"
+          className="object-contain"
         />
       </div>
       {price !== undefined && !available && (
@@ -101,19 +101,18 @@ export default function ArtworkCard({
       <div className="group text-left">
         <Link href={href ?? "#"}>{image}</Link>
         <div ref={captionRef} className="pt-3">
-          <div className="flex items-baseline justify-between gap-2">
-            <Link href={href ?? "#"} className="hover:text-accent">
-              {captionText}
+          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+            <Link href={href ?? "#"} className="flex items-center gap-2 hover:text-accent">
+              <h3 className="font-serif text-base text-ink">{title}</h3>
+              {price !== undefined && (
+                <span className="shrink-0 text-sm text-accent">
+                  {price > 0 ? `₹${price.toLocaleString("en-IN")}` : "Enquire"}
+                </span>
+              )}
             </Link>
-            {price !== undefined && (
-              <span className="shrink-0 text-sm text-accent">
-                {price > 0 ? `₹${price.toLocaleString("en-IN")}` : "Enquire"}
-              </span>
-            )}
-          </div>
-          <div className="mt-3">
             <AddToCartButton art={cartArt} size="sm" />
           </div>
+          {subtitle && <p className="mt-1 text-xs uppercase tracking-wide text-stone">{subtitle}</p>}
         </div>
       </div>
     );
