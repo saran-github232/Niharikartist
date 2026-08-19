@@ -3,7 +3,7 @@
 // TODO: replace with the real WhatsApp Business number, digits only, country code first
 // (e.g. "919876543210" for a +91 Indian number). Every WhatsApp CTA on the site reads
 // from this single constant.
-export const WHATSAPP_NUMBER = "910000000000";
+export const WHATSAPP_NUMBER = "9493712599";
 
 export const siteConfig = {
   name: "Niharika Artist",
