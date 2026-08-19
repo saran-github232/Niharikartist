@@ -7,11 +7,11 @@ import SectionHeading from "@/components/SectionHeading";
 import Reveal from "@/components/Reveal";
 import FadeImage from "@/components/FadeImage";
 import HeroIntro from "@/components/HeroIntro";
-import HeroScene from "@/components/three/HeroScene";
+import SpinImageOrbit from "@/components/SpinImageOrbit";
 import { whatsappLink, generalEnquiryMessage } from "@/lib/whatsapp";
 
 const featured = galleryArtworks.slice(0, 8);
-const heroRingImages = galleryArtworks.slice(0, 9).map((a) => ({ id: a.id, imageUrl: a.imageUrl }));
+const heroRingImages = galleryArtworks.slice(0, 9).map((a) => a.imageUrl);
 const philosophy = artist.bio
   .split("\n")
   .map((l) => l.trim())
@@ -34,7 +34,9 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/30 to-ink/10" />
         <div className="absolute inset-0 bg-gradient-to-r from-ink/40 via-transparent to-transparent md:from-ink/50" />
 
-        <HeroScene images={heroRingImages} />
+        <div className="absolute inset-y-0 right-0 hidden w-[58%] md:block">
+          <SpinImageOrbit images={heroRingImages} />
+        </div>
 
         <HeroIntro className="relative mx-auto w-full max-w-6xl px-5 pb-16 md:px-8 md:pb-24">
           <p className="text-xs font-medium uppercase tracking-[0.25em] text-ivory/70">
