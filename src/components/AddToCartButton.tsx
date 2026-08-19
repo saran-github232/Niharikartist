@@ -14,7 +14,7 @@ export default function AddToCartButton({
   art: ShopArtwork;
   size?: "sm" | "md";
 }) {
-  const { isInCart, add, open } = useCart();
+  const { isInCart, add, remove } = useCart();
   const status = deriveAvailability(art.available);
   const inCart = isInCart(art.slug);
   const sizeClasses = size === "sm" ? "px-3.5 py-1.5 text-xs" : "px-6 py-3 text-sm";
@@ -55,15 +55,19 @@ export default function AddToCartButton({
     );
   }
 
+  // Same button toggles both ways: adds when not in the selection, removes
+  // when it is — no separate "view"/"remove" affordance to reach for.
   if (inCart) {
     return (
       <button
         type="button"
-        onClick={open}
+        onClick={() => remove(art.slug)}
+        aria-pressed="true"
+        aria-label={`${art.title} is in your selection. Remove it.`}
         className={`flex w-fit items-center gap-1.5 rounded-full border border-accent font-medium text-accent transition-colors hover:bg-accent hover:text-ivory ${sizeClasses}`}
       >
         <CartIcon className={iconSize} />
-        Added · View
+        Added · Remove
       </button>
     );
   }
@@ -72,6 +76,7 @@ export default function AddToCartButton({
     <button
       type="button"
       onClick={() => add(art.slug)}
+      aria-pressed="false"
       aria-label={`Add ${art.title} to your selection`}
       className={`flex w-fit items-center gap-1.5 rounded-full bg-charcoal font-medium text-ivory transition-colors hover:bg-accent ${sizeClasses}`}
     >

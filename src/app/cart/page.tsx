@@ -12,7 +12,7 @@ import WhatsAppIcon from "@/components/WhatsAppIcon";
 export default function CartPage() {
   const { items, count, remove } = useCart();
   const whatsappReady = isWhatsAppConfigured();
-  const enquireLabel = count > 1 ? "Enquire About Selection" : "Enquire via WhatsApp";
+  const enquireLabel = count > 1 ? "Discuss This Selection" : "Enquire via WhatsApp";
 
   return (
     <div className="mx-auto max-w-4xl px-5 py-16 md:px-8 md:py-24">

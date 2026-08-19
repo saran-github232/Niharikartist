@@ -30,7 +30,7 @@ export default function CartDrawer() {
   if (!isOpen) return null;
 
   const whatsappReady = isWhatsAppConfigured();
-  const enquireLabel = count > 1 ? "Enquire About Selection" : "Enquire via WhatsApp";
+  const enquireLabel = count > 1 ? "Discuss This Selection" : "Enquire via WhatsApp";
 
   return (
     <div className="fixed inset-0 z-[80]" role="dialog" aria-modal="true" aria-label="Your selection">
@@ -97,13 +97,13 @@ export default function CartDrawer() {
         {items.length > 0 && (
           <div className="space-y-3 border-t border-sand/60 px-5 py-4">
             <div className="flex gap-3">
-              <button
-                type="button"
+              <Link
+                href="/shop"
                 onClick={close}
-                className="flex-1 rounded-full border border-stone/30 px-4 py-2.5 text-sm text-ink hover:border-accent hover:text-accent"
+                className="flex-1 rounded-full border border-stone/30 px-4 py-2.5 text-center text-sm text-ink hover:border-accent hover:text-accent"
               >
                 Continue Exploring
-              </button>
+              </Link>
               <Link
                 href="/cart"
                 onClick={close}
