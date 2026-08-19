@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { shopArtworks } from "@/data/shop";
+import { getEffectiveShopArtworks } from "@/lib/shopOverrides";
 import ArtworkCard from "@/components/ArtworkCard";
 import SectionHeading from "@/components/SectionHeading";
 
@@ -8,7 +8,9 @@ export const metadata: Metadata = {
   description: "Own a piece of art — original paintings and prints available to purchase.",
 };
 
-export default function ShopPage() {
+export default async function ShopPage() {
+  const shopArtworks = await getEffectiveShopArtworks();
+
   return (
     <div className="mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-24">
       <SectionHeading

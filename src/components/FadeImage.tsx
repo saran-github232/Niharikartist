@@ -3,8 +3,18 @@
 import Image, { type ImageProps } from "next/image";
 import { useState } from "react";
 
-export default function FadeImage({ className = "", onLoad, alt, ...props }: ImageProps) {
+export default function FadeImage({ className = "", onLoad, alt, src, ...props }: ImageProps) {
   const [loaded, setLoaded] = useState(false);
+  const [prevSrc, setPrevSrc] = useState(src);
+
+  // The src can change without this component remounting (e.g. the lightbox
+  // swapping images in place) — `loaded` must reset so the new image gets its
+  // own shimmer/fade-in instead of silently showing the old frame at full
+  // opacity while the network fetches the new one.
+  if (src !== prevSrc) {
+    setPrevSrc(src);
+    setLoaded(false);
+  }
 
   return (
     <>
@@ -16,6 +26,7 @@ export default function FadeImage({ className = "", onLoad, alt, ...props }: Ima
       />
       <Image
         {...props}
+        src={src}
         alt={alt}
         className={`${className} transition-opacity duration-700 ${
           loaded ? "opacity-100" : "opacity-0"

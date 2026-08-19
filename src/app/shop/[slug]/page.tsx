@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { shopArtworks } from "@/data/shop";
+import { getEffectiveShopArtwork, getEffectiveShopArtworks } from "@/lib/shopOverrides";
 import { siteConfig } from "@/data/siteConfig";
 import ArtworkCard from "@/components/ArtworkCard";
 import { whatsappLink, singleArtworkEnquiryMessage } from "@/lib/whatsapp";
@@ -19,7 +20,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const art = shopArtworks.find((a) => a.slug === slug);
+  const art = await getEffectiveShopArtwork(slug);
   if (!art) return {};
   return {
     title: art.title,
@@ -34,10 +35,10 @@ export default async function ShopDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const art = shopArtworks.find((a) => a.slug === slug);
+  const art = await getEffectiveShopArtwork(slug);
   if (!art) notFound();
 
-  const related = shopArtworks.filter((a) => a.slug !== art.slug).slice(0, 4);
+  const related = (await getEffectiveShopArtworks()).filter((a) => a.slug !== art.slug).slice(0, 4);
 
   const productJsonLd = {
     "@context": "https://schema.org",
