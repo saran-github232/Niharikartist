@@ -40,24 +40,7 @@ body {
   color: var(--color-ivory);
 }
 
-/* scroll-reveal: visible by default (no-JS / missed-observer safe fallback).
-   JS adds .reveal-pending on mount, then .is-visible once scrolled into view. */
-.reveal.reveal-pending {
-  opacity: 0;
-  transform: translateY(16px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
-}
-.reveal.reveal-pending.is-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .reveal {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
   * {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;

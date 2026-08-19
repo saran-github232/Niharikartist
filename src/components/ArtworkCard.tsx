@@ -1,5 +1,8 @@
-import Image from "next/image";
+"use client";
+
 import Link from "next/link";
+import FadeImage from "./FadeImage";
+import { useTilt3D } from "@/lib/useTilt3D";
 
 export default function ArtworkCard({
   title,
@@ -20,16 +23,21 @@ export default function ArtworkCard({
   onClick?: () => void;
   priority?: boolean;
 }) {
+  const tiltRef = useTilt3D<HTMLDivElement>(8);
+
   const body = (
     <>
-      <div className="relative aspect-[4/5] overflow-hidden bg-sand">
-        <Image
+      <div
+        ref={tiltRef}
+        className="relative aspect-[4/5] overflow-hidden bg-sand will-change-transform"
+      >
+        <FadeImage
           src={imageUrl}
           alt={title}
           fill
           sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
           priority={priority}
-          className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+          className="object-cover"
         />
         {price !== undefined && !available && (
           <span className="absolute left-3 top-3 rounded-full bg-ink/80 px-3 py-1 text-xs text-ivory">

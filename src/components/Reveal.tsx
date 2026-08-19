@@ -1,6 +1,10 @@
 "use client";
 
 import { useEffect, useRef, type ReactNode } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+let pluginRegistered = false;
 
 export default function Reveal({
   children,
@@ -15,32 +19,35 @@ export default function Reveal({
 
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
-    // Only start hiding content once JS is confirmed running — keeps the
-    // element visible by default for no-JS clients and crawlers.
-    el.classList.add("reveal-pending");
-    // Generous margin/threshold: real scrolling rarely jumps more than a
-    // viewport at a time, so this reliably catches the element before or as
-    // it enters view rather than requiring it to already be mid-viewport.
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          el.classList.add("is-visible");
-          observer.disconnect();
+    // Visible-by-default: GSAP only animates FROM a hidden state once JS is
+    // confirmed running, so no-JS clients and crawlers always see full content.
+    if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    if (!pluginRegistered) {
+      gsap.registerPlugin(ScrollTrigger);
+      pluginRegistered = true;
+    }
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        el,
+        { opacity: 0, y: 24 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          delay: delay / 1000,
+          ease: "power3.out",
+          scrollTrigger: { trigger: el, start: "top 90%", once: true },
         }
-      },
-      { threshold: 0, rootMargin: "0px 0px -10% 0px" }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
+      );
+    });
+
+    return () => ctx.revert();
+  }, [delay]);
 
   return (
-    <div
-      ref={ref}
-      className={`reveal ${className}`}
-      style={{ transitionDelay: `${delay}ms` }}
-    >
+    <div ref={ref} className={className}>
       {children}
     </div>
   );

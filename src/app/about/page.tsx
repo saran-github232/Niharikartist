@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { artist } from "@/data/artist";
 import SectionHeading from "@/components/SectionHeading";
 import Reveal from "@/components/Reveal";
+import FadeImage from "@/components/FadeImage";
 
 export const metadata: Metadata = {
   title: "About the Artist",
@@ -29,7 +29,7 @@ export default function AboutPage() {
 
       <section className="mx-auto grid max-w-6xl gap-10 px-5 pb-20 md:grid-cols-[0.9fr_1.1fr] md:gap-16 md:px-8 md:pb-28">
         <Reveal className="relative aspect-[4/5] overflow-hidden">
-          <Image
+          <FadeImage
             src={artist.profileImage}
             alt={artist.name}
             fill

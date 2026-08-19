@@ -1,13 +1,17 @@
-import Image from "next/image";
 import Link from "next/link";
 import { artist } from "@/data/artist";
 import { galleryArtworks, galleryCategories } from "@/data/gallery";
 import ArtworkCard from "@/components/ArtworkCard";
+import CategoryCard from "@/components/CategoryCard";
 import SectionHeading from "@/components/SectionHeading";
 import Reveal from "@/components/Reveal";
+import FadeImage from "@/components/FadeImage";
+import HeroIntro from "@/components/HeroIntro";
+import HeroScene from "@/components/three/HeroScene";
 import { whatsappLink, generalEnquiryMessage } from "@/lib/whatsapp";
 
 const featured = galleryArtworks.slice(0, 8);
+const heroRingImages = galleryArtworks.slice(0, 9).map((a) => ({ id: a.id, imageUrl: a.imageUrl }));
 const philosophy = artist.bio
   .split("\n")
   .map((l) => l.trim())
@@ -19,7 +23,7 @@ export default function Home() {
     <div>
       {/* Hero */}
       <section className="relative flex min-h-[85vh] items-end overflow-hidden">
-        <Image
+        <FadeImage
           src={artist.heroImage}
           alt=""
           fill
@@ -28,7 +32,11 @@ export default function Home() {
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/30 to-ink/10" />
-        <div className="relative mx-auto w-full max-w-6xl px-5 pb-16 md:px-8 md:pb-24">
+        <div className="absolute inset-0 bg-gradient-to-r from-ink/40 via-transparent to-transparent md:from-ink/50" />
+
+        <HeroScene images={heroRingImages} />
+
+        <HeroIntro className="relative mx-auto w-full max-w-6xl px-5 pb-16 md:px-8 md:pb-24">
           <p className="text-xs font-medium uppercase tracking-[0.25em] text-ivory/70">
             Ananthoja Niharika · Hyderabad, India
           </p>
@@ -52,7 +60,7 @@ export default function Home() {
               Enquire on WhatsApp
             </a>
           </div>
-        </div>
+        </HeroIntro>
       </section>
 
       {/* Featured artwork */}
@@ -93,7 +101,7 @@ export default function Home() {
       <section className="bg-paper py-20 md:py-28">
         <div className="mx-auto grid max-w-6xl gap-10 px-5 md:grid-cols-[0.9fr_1.1fr] md:gap-16 md:px-8">
           <Reveal className="relative aspect-[4/5] overflow-hidden">
-            <Image
+            <FadeImage
               src={artist.profileImage}
               alt={artist.name}
               fill
@@ -136,21 +144,7 @@ export default function Home() {
             if (!sample) return null;
             return (
               <Reveal key={cat} delay={i * 60}>
-                <Link href={`/gallery?category=${encodeURIComponent(cat)}`} className="group block">
-                  <div className="relative aspect-[3/4] overflow-hidden">
-                    <Image
-                      src={sample.imageUrl}
-                      alt={cat}
-                      fill
-                      sizes="(min-width: 1024px) 25vw, 50vw"
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
-                    <span className="absolute bottom-4 left-4 font-serif text-lg text-ivory">
-                      {cat}
-                    </span>
-                  </div>
-                </Link>
+                <CategoryCard category={cat} sample={sample} />
               </Reveal>
             );
           })}

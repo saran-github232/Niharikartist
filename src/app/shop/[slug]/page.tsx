@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { shopArtworks } from "@/data/shop";
@@ -7,6 +6,7 @@ import { siteConfig } from "@/data/siteConfig";
 import ArtworkCard from "@/components/ArtworkCard";
 import { whatsappLink, artworkEnquiryMessage } from "@/lib/whatsapp";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
+import FadeImage from "@/components/FadeImage";
 
 export function generateStaticParams() {
   return shopArtworks.map((a) => ({ slug: a.slug }));
@@ -72,7 +72,7 @@ export default async function ShopDetailPage({
 
       <div className="mt-8 grid gap-10 md:grid-cols-2 md:gap-16">
         <div className="relative aspect-[4/5] overflow-hidden bg-sand">
-          <Image
+          <FadeImage
             src={art.imageUrl}
             alt={art.title}
             fill

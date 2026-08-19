@@ -2,12 +2,11 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    remotePatterns: [{ protocol: "https", hostname: "i.ibb.co" }],
-    // ponytail: ibb.co is a free hotlink host; Next's server-side re-fetch/resize
-    // times out against it under load. Serving originals unoptimized is correct
-    // here — upgrade to optimized delivery only after migrating images to a real
-    // CDN/storage (Cloudinary, Vercel Blob, S3) that Next can reliably fetch from.
-    unoptimized: true,
+    // ibb.co source images are un-resized phone photos (1-2MB+ each) and Next's
+    // built-in optimizer times out fetching them server-side. A custom loader
+    // routes through a resizing proxy instead — see src/lib/image-loader.ts.
+    loader: "custom",
+    loaderFile: "./src/lib/image-loader.ts",
   },
 };
 
