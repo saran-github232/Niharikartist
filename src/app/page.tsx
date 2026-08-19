@@ -8,6 +8,7 @@ import FadeImage from "@/components/FadeImage";
 import HeroIntro from "@/components/HeroIntro";
 import SpinImageOrbit from "@/components/SpinImageOrbit";
 import CoverflowCarousel, { type CoverflowItem } from "@/components/CoverflowCarousel";
+import NeonBorder from "@/components/originkit/ui/neon-border";
 import { whatsappLink, generalEnquiryMessage } from "@/lib/whatsapp";
 
 const featured: CoverflowItem[] = galleryArtworks.slice(0, 8).map((a) => ({
@@ -97,14 +98,19 @@ export default function Home() {
       {/* Artist introduction */}
       <section className="bg-paper py-20 md:py-28">
         <div className="mx-auto grid max-w-6xl gap-10 px-5 md:grid-cols-[0.9fr_1.1fr] md:gap-16 md:px-8">
-          <Reveal className="relative aspect-[4/5] overflow-hidden">
-            <FadeImage
-              src={artist.profileImage}
-              alt={artist.name}
-              fill
-              sizes="(min-width: 768px) 40vw, 90vw"
-              className="object-cover"
-            />
+          <Reveal className="relative">
+            <div className="relative aspect-[4/5] overflow-hidden">
+              <FadeImage
+                src={artist.profileImage}
+                alt={artist.name}
+                fill
+                sizes="(min-width: 768px) 40vw, 90vw"
+                className="object-cover"
+              />
+            </div>
+            <div className="pointer-events-none absolute inset-0">
+              <NeonBorder color="#D9954A" rounded={0} thickness={3} borderSize={45} glow={65} speed={6} />
+            </div>
           </Reveal>
           <Reveal delay={100} className="flex flex-col justify-center">
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">

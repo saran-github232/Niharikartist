@@ -3,6 +3,7 @@ import { artist } from "@/data/artist";
 import SectionHeading from "@/components/SectionHeading";
 import Reveal from "@/components/Reveal";
 import FadeImage from "@/components/FadeImage";
+import NeonBorder from "@/components/originkit/ui/neon-border";
 
 export const metadata: Metadata = {
   title: "About the Artist",
@@ -28,15 +29,20 @@ export default function AboutPage() {
       </section>
 
       <section className="mx-auto grid max-w-6xl gap-10 px-5 pb-20 md:grid-cols-[0.9fr_1.1fr] md:gap-16 md:px-8 md:pb-28">
-        <Reveal className="relative aspect-[4/5] overflow-hidden">
-          <FadeImage
-            src={artist.profileImage}
-            alt={artist.name}
-            fill
-            sizes="(min-width: 768px) 40vw, 90vw"
-            priority
-            className="object-cover"
-          />
+        <Reveal className="relative">
+          <div className="relative aspect-[4/5] overflow-hidden">
+            <FadeImage
+              src={artist.profileImage}
+              alt={artist.name}
+              fill
+              sizes="(min-width: 768px) 40vw, 90vw"
+              priority
+              className="object-cover"
+            />
+          </div>
+          <div className="pointer-events-none absolute inset-0">
+            <NeonBorder color="#D9954A" rounded={0} thickness={3} borderSize={45} glow={65} speed={6} />
+          </div>
         </Reveal>
         <Reveal delay={100} className="flex flex-col justify-center gap-4">
           <h1 className="font-serif text-2xl text-ink md:text-3xl">{artist.name}</h1>
