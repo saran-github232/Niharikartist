@@ -28,7 +28,11 @@ export interface CoverflowItem {
   href?: string;
 }
 
-const SIZING = { activeWidth: 460, activeHeight: 340, restWidth: 150, restHeight: 210 };
+// Portrait-leaning (not landscape): most of this artwork is portrait-oriented,
+// and a wide landscape active box forced a heavy crop on it — "contain" below
+// keeps every piece fully visible regardless of its own aspect ratio, and
+// this box shape just minimizes how much letterboxing that needs.
+const SIZING = { activeWidth: 360, activeHeight: 440, restWidth: 140, restHeight: 200 };
 const GAP = 22;
 const RADIUS = 3; // 0 (square) .. 20 (fully rounded)
 const RENDER_RANGE = 6;
@@ -127,7 +131,7 @@ function Card({
           style={{
             width: "100%",
             height: "100%",
-            objectFit: "cover",
+            objectFit: "contain",
             display: "block",
             pointerEvents: "none",
             userSelect: "none",
@@ -205,7 +209,7 @@ export default function CoverflowCarousel({ items }: { items: CoverflowItem[] })
           dwellAccRef.current += dt;
           if (dwellAccRef.current >= DWELL) {
             dwellAccRef.current = 0;
-            targetRef.current -= 1;
+            targetRef.current += 1;
           }
           rafRef.current = requestAnimationFrame((t2) => tickRef.current(t2));
           return;

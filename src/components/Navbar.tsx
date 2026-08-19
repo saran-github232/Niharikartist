@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { siteConfig, WHATSAPP_NUMBER } from "@/data/siteConfig";
 import { whatsappLink, generalEnquiryMessage } from "@/lib/whatsapp";
+import CartButton from "./CartButton";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -67,6 +68,7 @@ export default function Navbar() {
               />
             </Link>
           ))}
+          <CartButton />
           {WHATSAPP_NUMBER && (
             <a
               href={whatsappLink(generalEnquiryMessage())}
@@ -79,13 +81,15 @@ export default function Navbar() {
           )}
         </nav>
 
-        <button
-          type="button"
-          aria-label={open ? "Close menu" : "Open menu"}
-          aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
-          className="flex size-10 items-center justify-center md:hidden"
-        >
+        <div className="flex items-center gap-4 md:hidden">
+          <CartButton />
+          <button
+            type="button"
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+            className="flex size-10 items-center justify-center"
+          >
           <span className="relative block h-4 w-6">
             <span
               className={`absolute left-0 top-0 h-px w-6 bg-ink transition-transform duration-300 ${
@@ -103,7 +107,8 @@ export default function Navbar() {
               }`}
             />
           </span>
-        </button>
+          </button>
+        </div>
       </div>
 
       <div

@@ -1,7 +1,15 @@
+"use client";
+
+import { usePathname } from "next/navigation";
 import { whatsappLink, generalEnquiryMessage } from "@/lib/whatsapp";
 import WhatsAppIcon from "./WhatsAppIcon";
 
 export default function FloatingWhatsApp() {
+  // /cart already has its own prominent "Enquire via WhatsApp" CTA — the
+  // floating button there would just sit on top of it on small screens.
+  const pathname = usePathname();
+  if (pathname === "/cart") return null;
+
   return (
     <a
       href={whatsappLink(generalEnquiryMessage())}

@@ -27,6 +27,7 @@ export default function ShopPage() {
             price={art.price}
             available={art.available}
             priority={i < 4}
+            cartArt={art}
           />
         ))}
       </div>

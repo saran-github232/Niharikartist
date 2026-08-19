@@ -5,6 +5,9 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 import AmbientBackground from "@/components/AmbientBackground";
+import { CartProvider } from "@/lib/cart";
+import CartDrawer from "@/components/CartDrawer";
+import CartToast from "@/components/CartToast";
 import { artist } from "@/data/artist";
 import { siteConfig } from "@/data/siteConfig";
 
@@ -67,11 +70,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
         />
-        <AmbientBackground />
-        <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <FloatingWhatsApp />
+        <CartProvider>
+          <AmbientBackground />
+          <Navbar />
+          <main className="flex-1">{children}</main>
+          <Footer />
+          <FloatingWhatsApp />
+          <CartDrawer />
+          <CartToast />
+        </CartProvider>
       </body>
     </html>
   );

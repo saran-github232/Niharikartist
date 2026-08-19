@@ -4,9 +4,10 @@ import { notFound } from "next/navigation";
 import { shopArtworks } from "@/data/shop";
 import { siteConfig } from "@/data/siteConfig";
 import ArtworkCard from "@/components/ArtworkCard";
-import { whatsappLink, artworkEnquiryMessage } from "@/lib/whatsapp";
+import { whatsappLink, singleArtworkEnquiryMessage } from "@/lib/whatsapp";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 import FadeImage from "@/components/FadeImage";
+import AddToCartButton from "@/components/AddToCartButton";
 
 export function generateStaticParams() {
   return shopArtworks.map((a) => ({ slug: a.slug }));
@@ -100,22 +101,17 @@ export default async function ShopDetailPage({
             {art.description}
           </div>
 
-          <div className="mt-8 flex flex-wrap gap-4">
+          <div className="mt-8 flex flex-wrap items-center gap-4">
+            <AddToCartButton art={art} />
             <a
-              href={whatsappLink(artworkEnquiryMessage(art.title))}
+              href={whatsappLink(singleArtworkEnquiryMessage(art))}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 rounded-full bg-[#25D366] px-6 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90"
+              className="flex items-center gap-2 text-sm text-stone underline decoration-accent underline-offset-4 hover:text-accent"
             >
               <WhatsAppIcon className="size-4" />
-              Enquire on WhatsApp
+              Enquire Directly
             </a>
-            <Link
-              href="/contact"
-              className="rounded-full border border-stone/40 px-6 py-3 text-sm font-medium text-ink transition-colors hover:border-accent hover:text-accent"
-            >
-              Contact Form
-            </Link>
           </div>
         </div>
       </div>
@@ -132,6 +128,7 @@ export default async function ShopDetailPage({
                 href={`/shop/${r.slug}`}
                 price={r.price}
                 available={r.available}
+                cartArt={r}
               />
             ))}
           </div>

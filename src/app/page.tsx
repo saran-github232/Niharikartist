@@ -105,11 +105,11 @@ export default function Home() {
                 alt={artist.name}
                 fill
                 sizes="(min-width: 768px) 40vw, 90vw"
-                className="object-cover"
+                className="object-cover object-[center_75%]"
               />
             </div>
             <div className="pointer-events-none absolute inset-0">
-              <NeonBorder color="#D9954A" rounded={0} thickness={3} borderSize={45} glow={65} speed={6} />
+              <NeonBorder color="#D9954A" rounded={0} thickness={3} borderSize={45} glow={65} speed={13} />
             </div>
           </Reveal>
           <Reveal delay={100} className="flex flex-col justify-center">

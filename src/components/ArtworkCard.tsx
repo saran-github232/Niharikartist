@@ -4,8 +4,10 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import FadeImage from "./FadeImage";
+import AddToCartButton from "./AddToCartButton";
 import { useTilt3D } from "@/lib/useTilt3D";
 import { ensureScrollTrigger } from "@/lib/scrollTrigger";
+import type { ShopArtwork } from "@/data/shop";
 
 export default function ArtworkCard({
   title,
@@ -16,6 +18,7 @@ export default function ArtworkCard({
   available,
   onClick,
   priority = false,
+  cartArt,
 }: {
   title: string;
   subtitle?: string;
@@ -25,6 +28,10 @@ export default function ArtworkCard({
   available?: boolean;
   onClick?: () => void;
   priority?: boolean;
+  /** When set, renders an AddToCartButton below the caption (shop context).
+   *  Kept separate from the card's own Link/button so the cart button never
+   *  ends up nested inside an anchor. */
+  cartArt?: ShopArtwork;
 }) {
   const tiltRef = useTilt3D<HTMLDivElement>(8);
   const revealRef = useRef<HTMLDivElement>(null);
@@ -57,33 +64,66 @@ export default function ArtworkCard({
     return () => ctx.revert();
   }, []);
 
+  const image = (
+    <div
+      ref={tiltRef}
+      className="relative aspect-[4/5] overflow-hidden bg-sand will-change-transform"
+    >
+      <div ref={revealRef} className="absolute inset-0">
+        <FadeImage
+          src={imageUrl}
+          alt={title}
+          fill
+          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+          priority={priority}
+          className="object-cover"
+        />
+      </div>
+      {price !== undefined && !available && (
+        <span className="absolute left-3 top-3 rounded-full bg-ink/80 px-3 py-1 text-xs text-ivory">
+          Sold
+        </span>
+      )}
+    </div>
+  );
+
+  const captionText = (
+    <div>
+      <h3 className="font-serif text-base text-ink">{title}</h3>
+      {subtitle && <p className="text-xs uppercase tracking-wide text-stone">{subtitle}</p>}
+    </div>
+  );
+
+  // Shop context: the button needs to be a sibling of the link, not nested
+  // inside it (a <button> inside an <a> is invalid HTML and double-fires).
+  if (cartArt) {
+    return (
+      <div className="group text-left">
+        <Link href={href ?? "#"}>{image}</Link>
+        <div ref={captionRef} className="pt-3">
+          <div className="flex items-baseline justify-between gap-2">
+            <Link href={href ?? "#"} className="hover:text-accent">
+              {captionText}
+            </Link>
+            {price !== undefined && (
+              <span className="shrink-0 text-sm text-accent">
+                {price > 0 ? `₹${price.toLocaleString("en-IN")}` : "Enquire"}
+              </span>
+            )}
+          </div>
+          <div className="mt-3">
+            <AddToCartButton art={cartArt} size="sm" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const body = (
     <>
-      <div
-        ref={tiltRef}
-        className="relative aspect-[4/5] overflow-hidden bg-sand will-change-transform"
-      >
-        <div ref={revealRef} className="absolute inset-0">
-          <FadeImage
-            src={imageUrl}
-            alt={title}
-            fill
-            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-            priority={priority}
-            className="object-cover"
-          />
-        </div>
-        {price !== undefined && !available && (
-          <span className="absolute left-3 top-3 rounded-full bg-ink/80 px-3 py-1 text-xs text-ivory">
-            Sold
-          </span>
-        )}
-      </div>
+      {image}
       <div ref={captionRef} className="flex items-baseline justify-between gap-2 pt-3">
-        <div>
-          <h3 className="font-serif text-base text-ink">{title}</h3>
-          {subtitle && <p className="text-xs uppercase tracking-wide text-stone">{subtitle}</p>}
-        </div>
+        {captionText}
         {price !== undefined && (
           <span className="shrink-0 text-sm text-accent">
             {price > 0 ? `₹${price.toLocaleString("en-IN")}` : "Enquire"}
