@@ -41,3 +41,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .originkit/
+
+# admin accounts (password hashes) — never committed, even locally-tested
+# ones. The app falls back to an empty admin list when this file is absent.
+data/admins.json

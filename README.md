@@ -37,12 +37,34 @@ regenerate automatically on next build — nothing else to touch.
 files from the live site's JSON; it's not part of the app and doesn't need to run
 again unless you're re-importing from that source.
 
-## Architecture notes / assumptions
+## Admin panel
 
-- **No live admin/CMS backend.** The original site had a `/login` admin panel backed
-  by a database. This rebuild trades that for flat data files, which is simpler to
-  host, free, and just as easy to edit for a solo artist maintaining their own site.
-  If a self-service editing UI becomes a real need later, that's a distinct project.
+A lightweight `/admin` panel lets you edit shop pricing/availability, add new
+products, and manage admin accounts — no database required.
+
+- **Accounts.** Up to 3 admins can be registered at `/admin/register`. Once all 3
+  seats are used, an existing admin has to sign in and remove one (from the
+  Admins section of the dashboard) before a new one can register. Passwords are
+  hashed (`scrypt`) and stored in `data/admins.json`, which is gitignored — it
+  never gets committed, even after local testing.
+- **Sign in / out** at `/admin/login`. Sessions are a signed cookie (HMAC'd with
+  `AUTH_SECRET`), so there's no session table to manage.
+- **Forgot password** at `/admin/forgot-password` emails a reset link via Resend
+  if `RESEND_API_KEY` is set; otherwise the link is logged to the server console
+  so the flow still works in local dev without a real email account. Reset links
+  expire after 30 minutes and — because the link is bound to the current password
+  hash — stop working the instant they're used once, even within that window.
+- **Shop editing.** Each row has its own Save button, plus a "Save all" button on
+  the dashboard that batches every changed row into one request. "Add product"
+  creates a brand-new listing (stored separately from the seed data in
+  `src/data/shop.ts`, so nothing there is ever overwritten) that appears on
+  `/shop` and gets its own `/shop/[slug]` page immediately.
+- **Persistence caveat.** All of this is backed by JSON files under `data/`,
+  written with plain `fs`. That's fully durable in local dev or on a host with a
+  persistent disk. It is **not** reliable on serverless hosting (Vercel, Netlify
+  functions) — the filesystem there is ephemeral, so a write from one request
+  isn't guaranteed to still be there on the next. See the Vercel section below
+  for what that means in practice and how to upgrade past it.
 - **Shop → WhatsApp enquiry, not checkout.** The old "Add to Cart" buttons had no
   payment gateway behind them. Product pages now enquire via WhatsApp instead,
   per the brief.
@@ -74,12 +96,44 @@ again unless you're re-importing from that source.
   was deliberately not carried over anywhere — it's private correspondence, not
   site content.
 
-## Deploy
+## Deploy to Vercel
 
-Any Next.js host works (Vercel is the path of least resistance — connect the repo,
-no environment variables required). `next build && next start`, or `next build`
-with static export hosting since every route is static except `/gallery` (uses
-`searchParams` for the category filter, so it's server-rendered — cheap either way).
+1. **Push to GitHub** (or GitLab/Bitbucket) if you haven't already — Vercel deploys
+   from a connected repo.
+2. **Import the project** at [vercel.com/new](https://vercel.com/new) → select this
+   repo. Framework preset auto-detects as Next.js; no build settings to change.
+3. **Set environment variables** (Project Settings → Environment Variables, or on
+   the import screen) — everything in `.env.example`:
+   - `AUTH_SECRET` — required to enable `/admin` at all. Generate one locally with
+     `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
+     and paste the output in. Without this set, `/admin/login` and
+     `/admin/register` render a "not set up yet" message instead of a form.
+   - `RESEND_API_KEY` — optional. Sign up at [resend.com](https://resend.com), get
+     an API key, add it here to make "forgot password" actually send email.
+     Without it, reset links are logged server-side (visible in the Vercel
+     function logs) instead of emailed — usable for testing, not for a real
+     forgotten-password admin.
+   - `RESEND_FROM_EMAIL` — optional, defaults to Resend's shared sandbox sender.
+     Set this to your own verified domain sender once you've set one up in
+     Resend, or the sandbox default will do for a demo.
+   - `WHATSAPP_NUMBER` isn't an env var — it's set directly in
+     `src/data/siteConfig.ts` (see above), so nothing to configure here for it.
+4. **Deploy.** Vercel builds and gives you a `*.vercel.app` URL immediately;
+   attach a custom domain afterwards under Project Settings → Domains.
+5. **Know the admin-panel limitation on Vercel.** Vercel's serverless functions
+   don't share a persistent filesystem — writes to `data/*.json` (shop edits, new
+   products, new admin accounts) can vanish between requests instead of
+   sticking. This is fine for a client demo of the *flow* (register, sign in,
+   edit, save), but don't rely on data persisting long-term in that
+   configuration. To make it durable in production, swap the `fs`-based
+   read/write calls in `src/lib/adminStore.ts` and `src/lib/shopOverrides.ts` for
+   [Vercel KV](https://vercel.com/docs/storage/vercel-kv) or a small database —
+   every caller (API routes, admin pages) goes through those two files' exported
+   functions, so nothing else needs to change.
+
+Any other Next.js host that gives you a persistent filesystem (a VPS, Railway,
+Render, etc. running `next build && next start`) doesn't have that caveat —
+`data/*.json` just works as real, durable storage there.
 
 ## QA performed
 

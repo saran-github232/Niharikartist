@@ -1,1 +1,18 @@
-{}
+{
+  "embrace-of-souls-2810c11f": {
+    "price": 0,
+    "available": false
+  },
+  "lord-shiva-c83a3b4f": {
+    "price": 299,
+    "available": true
+  },
+  "krishna-8ac75806": {
+    "price": 299,
+    "available": true
+  },
+  "sita-ram-946ad512": {
+    "price": 2599,
+    "available": true
+  }
+}

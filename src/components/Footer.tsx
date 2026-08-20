@@ -1,13 +1,17 @@
 import Link from "next/link";
 import { artist } from "@/data/artist";
 import { siteConfig } from "@/data/siteConfig";
+import Logo from "./Logo";
 
 export default function Footer() {
   return (
     <footer className="border-t border-sand/60 bg-paper">
       <div className="mx-auto grid max-w-6xl gap-10 px-5 py-14 md:grid-cols-3 md:px-8">
         <div>
-          <p className="font-serif text-lg text-ink">Niharika Artist</p>
+          <div className="flex items-center gap-2.5">
+            <Logo className="size-9 text-sm" />
+            <p className="font-serif text-lg text-ink">Niharika Artist</p>
+          </div>
           <p className="mt-3 max-w-xs text-sm leading-relaxed text-stone">
             Original paintings, portraits and live art from Hyderabad, India —
             each piece made by hand, one story at a time.

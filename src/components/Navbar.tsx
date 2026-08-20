@@ -7,6 +7,7 @@ import { siteConfig, WHATSAPP_NUMBER } from "@/data/siteConfig";
 import { whatsappLink, generalEnquiryMessage } from "@/lib/whatsapp";
 import CartButton from "./CartButton";
 import ThemeToggle from "./ThemeToggle";
+import Logo from "./Logo";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -47,8 +48,9 @@ export default function Navbar() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-5 md:px-8">
         <Link
           href="/"
-          className="font-serif text-lg font-medium tracking-wide text-ink md:text-xl"
+          className="flex items-center gap-2.5 font-serif text-lg font-medium tracking-wide text-ink md:text-xl"
         >
+          <Logo className="size-8 text-sm md:size-9 md:text-base" />
           Niharika Artist
         </Link>
 

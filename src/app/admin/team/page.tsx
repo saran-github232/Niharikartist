@@ -1,31 +1,25 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { ADMIN_COOKIE, decodeSessionCookie } from "@/lib/adminAuth";
-import { findAdminById, listAdmins, toPublicAdmin } from "@/lib/adminStore";
-import { getEffectiveShopArtworks } from "@/lib/shopOverrides";
-import AdminDashboard from "@/components/admin/AdminDashboard";
+import { findAdminById, listAdmins, ownerId, toPublicAdmin } from "@/lib/adminStore";
+import AdminTeam from "@/components/admin/AdminTeam";
 
 export const metadata = { robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
 
-export default async function AdminPage() {
+export default async function AdminTeamPage() {
   const jar = await cookies();
   const session = decodeSessionCookie(jar.get(ADMIN_COOKIE)?.value);
   if (!session) redirect("/admin/login");
 
-  const [items, admins, currentAdmin] = await Promise.all([
-    getEffectiveShopArtworks(),
-    listAdmins(),
-    findAdminById(session.adminId),
-  ]);
-
+  const [admins, currentAdmin] = await Promise.all([listAdmins(), findAdminById(session.adminId)]);
   if (!currentAdmin) redirect("/admin/login");
 
   return (
-    <AdminDashboard
-      initialItems={items}
+    <AdminTeam
       admins={admins.map(toPublicAdmin)}
       currentAdmin={toPublicAdmin(currentAdmin)}
+      ownerId={ownerId(admins)}
     />
   );
 }
