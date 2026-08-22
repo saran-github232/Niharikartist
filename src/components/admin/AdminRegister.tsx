@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
+import PasswordInput from "./PasswordInput";
 
 export default function AdminRegister({
   configured,
@@ -144,15 +145,14 @@ export default function AdminRegister({
           <label htmlFor="password" className="text-sm text-stone">
             Password
           </label>
-          <input
+          <PasswordInput
             id="password"
-            type="password"
             required
             minLength={8}
             autoComplete="new-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 w-full rounded-md border border-sand bg-ivory px-4 py-3 text-ink focus:border-accent"
+            className="mt-1"
           />
           <p className="mt-1 text-xs text-stone">At least 8 characters.</p>
         </div>

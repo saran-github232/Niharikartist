@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
+import PasswordInput from "./PasswordInput";
 
 export default function AdminLogin({ configured }: { configured: boolean }) {
   const router = useRouter();
@@ -71,14 +72,13 @@ export default function AdminLogin({ configured }: { configured: boolean }) {
           <label htmlFor="password" className="text-sm text-stone">
             Password
           </label>
-          <input
+          <PasswordInput
             id="password"
-            type="password"
             required
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 w-full rounded-md border border-sand bg-ivory px-4 py-3 text-ink focus:border-accent"
+            className="mt-1"
           />
         </div>
         {error && (
