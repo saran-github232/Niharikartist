@@ -263,7 +263,6 @@ function ChangePasswordForm({ onDone }: { onDone: () => void }) {
         return;
       }
       setDone(true);
-      setTimeout(onDone, 1200);
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -272,7 +271,23 @@ function ChangePasswordForm({ onDone }: { onDone: () => void }) {
   }
 
   if (done) {
-    return <p className="mt-3 text-sm text-accent">Password changed.</p>;
+    return (
+      <div className="mt-4 flex items-center justify-between gap-3 border-t border-sand/60 pt-4">
+        <p className="flex items-center gap-2 text-sm text-accent">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="size-4 shrink-0">
+            <path d="M20 6 9 17l-5-5" />
+          </svg>
+          Password changed successfully.
+        </p>
+        <button
+          type="button"
+          onClick={onDone}
+          className="shrink-0 rounded-full border border-stone/30 px-4 py-1.5 text-xs text-ink hover:border-accent hover:text-accent"
+        >
+          Done
+        </button>
+      </div>
+    );
   }
 
   return (
