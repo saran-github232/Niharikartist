@@ -22,26 +22,30 @@ function artworkUrl(slug: string): string {
 // artwork's freeform `description` (which often contains medium/size as
 // prose) isn't parsed apart here, since that would be guessing at a format
 // that isn't consistent across entries. The artwork URL carries that detail.
+//
+// Titles and the header line use WhatsApp's own *bold* markdown so the
+// message is scannable at a glance in the chat itself, not just readable —
+// that's what was missing when the message was plain, undifferentiated text.
 function artworkLines(art: ShopArtwork, index?: number): string {
   const lines: string[] = [];
-  lines.push(index !== undefined ? `${index}. ${art.title}` : art.title);
+  lines.push(index !== undefined ? `${index}. *${art.title}*` : `*${art.title}*`);
   const indent = index !== undefined ? "   " : "";
   if (art.price > 0) {
     lines.push(`${indent}Price: ₹${art.price.toLocaleString("en-IN")}`);
   }
   lines.push(`${indent}Availability: ${AVAILABILITY_LABEL[deriveAvailability(art.available)]}`);
-  lines.push(`${indent}View: ${artworkUrl(art.slug)}`);
+  lines.push(`${indent}Link: ${artworkUrl(art.slug)}`);
   return lines.join("\n");
 }
 
 export function singleArtworkEnquiryMessage(art: ShopArtwork): string {
   return [
-    "Hello, I'm interested in the following artwork:",
+    `*New order enquiry — ${siteConfig.name}*`,
     "",
     artworkLines(art),
     "",
-    "I would like to know more about its availability and purchase details.",
-    "Thank you.",
+    "I'd like to know more about availability and how to purchase this.",
+    "Thank you!",
   ].join("\n");
 }
 
@@ -50,12 +54,16 @@ export function cartEnquiryMessage(items: ShopArtwork[]): string {
   if (items.length === 1) return singleArtworkEnquiryMessage(items[0]);
 
   const body = items.map((art, i) => artworkLines(art, i + 1)).join("\n\n");
+  const total = items.reduce((sum, art) => sum + art.price, 0);
+
   return [
-    "Hello, I'm interested in the following artworks from your collection:",
+    `*New order enquiry — ${siteConfig.name}*`,
+    `${items.length} pieces`,
     "",
     body,
     "",
-    "I would like to know more about the availability and purchase details of these artworks.",
-    "Thank you.",
+    ...(total > 0 ? [`*Total: ₹${total.toLocaleString("en-IN")}*`, ""] : []),
+    "I'd like to know more about availability and how to purchase these.",
+    "Thank you!",
   ].join("\n");
 }

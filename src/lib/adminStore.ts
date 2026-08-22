@@ -21,6 +21,11 @@ export interface AdminAccount {
    *  Everyone after that starts pending until the Owner approves them —
    *  a pending account can't log in. */
   status: "pending" | "approved";
+  /** Explicit — not just "earliest createdAt" — so ownership can be handed
+   *  off deliberately via transferOwnership() without needing to touch
+   *  createdAt (which stays as the real join date). Accounts written before
+   *  this field existed have none; ownerId() falls back to createdAt then. */
+  isOwner?: boolean;
 }
 
 export type PublicAdmin = Omit<AdminAccount, "passwordHash">;
@@ -49,12 +54,16 @@ export function toPublicAdmin(a: AdminAccount): PublicAdmin {
   return rest;
 }
 
-/** The earliest-registered admin is the Owner — no stored role/migration
- *  needed, and ownership transfers automatically if that account is ever
- *  removed. Only the Owner can remove other admins (registration itself
- *  stays open to anyone while a seat is free). */
-export function ownerId(admins: Array<{ id: string; createdAt: string }>): string | undefined {
+/** Whoever has `isOwner: true` is the Owner. Accounts predating that field
+ *  (or if it's ever unset on everyone — e.g. the removed owner's account)
+ *  fall back to the earliest-registered admin, so this never returns nobody
+ *  as long as an admin exists. Only the Owner can approve/remove admins or
+ *  transfer ownership (registration itself stays open to anyone while a
+ *  seat is free). */
+export function ownerId(admins: Array<{ id: string; createdAt: string; isOwner?: boolean }>): string | undefined {
   if (admins.length === 0) return undefined;
+  const explicit = admins.find((a) => a.isOwner);
+  if (explicit) return explicit.id;
   return admins.reduce((owner, a) => (a.createdAt < owner.createdAt ? a : owner)).id;
 }
 
@@ -91,6 +100,7 @@ export async function registerAdmin(
     passwordHash: hashPassword(password),
     createdAt: new Date().toISOString(),
     status: admins.length === 0 ? "approved" : "pending",
+    isOwner: admins.length === 0,
   };
   admins.push(admin);
   await writeAdmins(admins);
@@ -103,6 +113,20 @@ export async function approveAdmin(id: string): Promise<boolean> {
   const admin = admins.find((a) => a.id === id);
   if (!admin || admin.status === "approved") return false;
   admin.status = "approved";
+  await writeAdmins(admins);
+  return true;
+}
+
+/** Owner-only: hands the Owner role to another approved admin. The old
+ *  owner keeps their account, just demoted to a regular admin. */
+export async function transferOwnership(currentOwnerId: string, newOwnerId: string): Promise<boolean> {
+  if (currentOwnerId === newOwnerId) return false;
+  const admins = await readAdmins();
+  const current = admins.find((a) => a.id === currentOwnerId);
+  const next = admins.find((a) => a.id === newOwnerId);
+  if (!current || !next || next.status !== "approved") return false;
+
+  for (const a of admins) a.isOwner = a.id === newOwnerId;
   await writeAdmins(admins);
   return true;
 }

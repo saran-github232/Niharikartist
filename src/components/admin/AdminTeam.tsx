@@ -24,7 +24,7 @@ function Tag({ variant, children }: { variant: "owner" | "admin" | "pending" | "
 export default function AdminTeam({
   admins,
   currentAdmin,
-  ownerId,
+  ownerId: initialOwnerId,
 }: {
   admins: PublicAdmin[];
   currentAdmin: PublicAdmin;
@@ -32,6 +32,7 @@ export default function AdminTeam({
 }) {
   const router = useRouter();
   const [adminList, setAdminList] = useState(admins);
+  const [ownerId, setOwnerId] = useState(initialOwnerId);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const isOwner = currentAdmin.id === ownerId;
@@ -76,6 +77,28 @@ export default function AdminTeam({
     } else {
       const data = await res.json().catch(() => null);
       setError(data?.error ?? "Couldn't approve that request.");
+    }
+    setBusyId(null);
+    router.refresh();
+  }
+
+  async function makeOwner(id: string, name: string) {
+    const confirmed = window.confirm(
+      `Make ${name} the owner? You'll become a regular admin and lose the ability to approve or remove other admins.`
+    );
+    if (!confirmed) return;
+    setError(null);
+    setBusyId(id);
+    const res = await fetch("/api/admin/admins/transfer-owner", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    if (res.ok) {
+      setOwnerId(id);
+    } else {
+      const data = await res.json().catch(() => null);
+      setError(data?.error ?? "Couldn't transfer ownership.");
     }
     setBusyId(null);
     router.refresh();
@@ -160,14 +183,24 @@ export default function AdminTeam({
                 </div>
 
                 {isOwner && admin.id !== currentAdmin.id && (
-                  <button
-                    type="button"
-                    onClick={() => removeAdmin(admin.id, admin.name, false)}
-                    disabled={busyId === admin.id}
-                    className="shrink-0 rounded-full border border-red-700/30 px-4 py-1.5 text-xs text-red-700 hover:bg-red-50 disabled:opacity-60 sm:self-center"
-                  >
-                    {busyId === admin.id ? "Removing…" : "Remove"}
-                  </button>
+                  <div className="flex shrink-0 gap-2 sm:self-center">
+                    <button
+                      type="button"
+                      onClick={() => makeOwner(admin.id, admin.name)}
+                      disabled={busyId === admin.id}
+                      className="rounded-full border border-stone/30 px-4 py-1.5 text-xs text-ink hover:border-accent hover:text-accent disabled:opacity-60"
+                    >
+                      {busyId === admin.id ? "…" : "Make Owner"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => removeAdmin(admin.id, admin.name, false)}
+                      disabled={busyId === admin.id}
+                      className="rounded-full border border-red-700/30 px-4 py-1.5 text-xs text-red-700 hover:bg-red-50 disabled:opacity-60"
+                    >
+                      {busyId === admin.id ? "Removing…" : "Remove"}
+                    </button>
+                  </div>
                 )}
               </li>
             );

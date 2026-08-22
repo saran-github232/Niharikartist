@@ -8,6 +8,7 @@ import { whatsappLink, generalEnquiryMessage } from "@/lib/whatsapp";
 import CartButton from "./CartButton";
 import ThemeToggle from "./ThemeToggle";
 import Logo from "./Logo";
+import WhatsAppLink from "./WhatsAppLink";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -74,14 +75,12 @@ export default function Navbar() {
           <CartButton />
           <ThemeToggle />
           {WHATSAPP_NUMBER && (
-            <a
+            <WhatsAppLink
               href={whatsappLink(generalEnquiryMessage())}
-              target="_blank"
-              rel="noopener noreferrer"
               className="rounded-full bg-charcoal px-5 py-2 text-sm text-ivory transition-colors hover:bg-accent"
             >
               WhatsApp
-            </a>
+            </WhatsAppLink>
           )}
         </nav>
 
@@ -136,14 +135,12 @@ export default function Navbar() {
             <span className="text-sm text-stone">Theme</span>
             <ThemeToggle />
           </div>
-          <a
+          <WhatsAppLink
             href={whatsappLink(generalEnquiryMessage())}
-            target="_blank"
-            rel="noopener noreferrer"
             className="mt-1 rounded-full bg-charcoal px-5 py-3 text-center text-base text-ivory"
           >
             Enquire on WhatsApp
-          </a>
+          </WhatsAppLink>
         </nav>
       </div>
     </header>

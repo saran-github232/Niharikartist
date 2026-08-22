@@ -4,6 +4,7 @@ import SectionHeading from "@/components/SectionHeading";
 import ContactForm from "@/components/ContactForm";
 import { whatsappLink, generalEnquiryMessage } from "@/lib/whatsapp";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
+import WhatsAppLink from "@/components/WhatsAppLink";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -45,15 +46,13 @@ export default function ContactPage() {
             </div>
           </dl>
 
-          <a
+          <WhatsAppLink
             href={whatsappLink(generalEnquiryMessage())}
-            target="_blank"
-            rel="noopener noreferrer"
             className="mt-8 flex w-fit items-center gap-2 rounded-full bg-[#25D366] px-6 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90"
           >
             <WhatsAppIcon className="size-4" />
             Chat on WhatsApp
-          </a>
+          </WhatsAppLink>
         </div>
 
         <ContactForm />

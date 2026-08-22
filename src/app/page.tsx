@@ -9,6 +9,7 @@ import HeroIntro from "@/components/HeroIntro";
 import SpinImageOrbit from "@/components/SpinImageOrbit";
 import CoverflowCarousel, { type CoverflowItem } from "@/components/CoverflowCarousel";
 import NeonBorder from "@/components/originkit/ui/neon-border";
+import WhatsAppLink from "@/components/WhatsAppLink";
 import { whatsappLink, generalEnquiryMessage } from "@/lib/whatsapp";
 
 const featured: CoverflowItem[] = galleryArtworks.slice(0, 8).map((a) => ({
@@ -59,14 +60,12 @@ export default function Home() {
             >
               Explore Artwork
             </Link>
-            <a
+            <WhatsAppLink
               href={whatsappLink(generalEnquiryMessage())}
-              target="_blank"
-              rel="noopener noreferrer"
               className="rounded-full border border-ivory/50 px-7 py-3 text-sm font-medium text-ivory transition-colors hover:border-ivory hover:bg-ivory/10"
             >
               Enquire on WhatsApp
-            </a>
+            </WhatsAppLink>
           </div>
         </HeroIntro>
       </section>
@@ -174,14 +173,12 @@ export default function Home() {
             I&apos;d love to hear from you.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <a
+            <WhatsAppLink
               href={whatsappLink(generalEnquiryMessage())}
-              target="_blank"
-              rel="noopener noreferrer"
               className="rounded-full bg-charcoal px-7 py-3 text-sm font-medium text-ivory transition-colors hover:bg-accent"
             >
               Enquire on WhatsApp
-            </a>
+            </WhatsAppLink>
             <Link
               href="/contact"
               className="rounded-full border border-stone/40 px-7 py-3 text-sm font-medium text-ink transition-colors hover:border-accent hover:text-accent"

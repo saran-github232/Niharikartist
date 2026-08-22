@@ -1,8 +1,7 @@
 // Central place for values that change per deployment. Edit here, nowhere else.
 
-// TODO: replace with the real WhatsApp Business number, digits only, country code first
-// (e.g. "919876543210" for a +91 Indian number). Every WhatsApp CTA on the site reads
-// from this single constant.
+// The WhatsApp number every CTA on the site reads from (digits only, country
+// code first, e.g. "919876543210" for a +91 Indian number).
 export const WHATSAPP_NUMBER = "919493712599";
 
 export const siteConfig = {

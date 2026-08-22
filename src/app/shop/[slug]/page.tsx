@@ -7,6 +7,7 @@ import { siteConfig } from "@/data/siteConfig";
 import ArtworkCard from "@/components/ArtworkCard";
 import { whatsappLink, singleArtworkEnquiryMessage } from "@/lib/whatsapp";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
+import WhatsAppLink from "@/components/WhatsAppLink";
 import FadeImage from "@/components/FadeImage";
 import AddToCartButton from "@/components/AddToCartButton";
 
@@ -104,15 +105,13 @@ export default async function ShopDetailPage({
 
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <AddToCartButton art={art} />
-            <a
+            <WhatsAppLink
               href={whatsappLink(singleArtworkEnquiryMessage(art))}
-              target="_blank"
-              rel="noopener noreferrer"
               className="flex items-center gap-2 text-sm text-stone underline decoration-accent underline-offset-4 hover:text-accent"
             >
               <WhatsAppIcon className="size-4" />
               Enquire Directly
-            </a>
+            </WhatsAppLink>
           </div>
         </div>
       </div>

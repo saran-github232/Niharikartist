@@ -6,6 +6,7 @@ import { deriveAvailability } from "@/lib/availability";
 import { whatsappLink, singleArtworkEnquiryMessage, isWhatsAppConfigured } from "@/lib/whatsapp";
 import CartIcon from "./CartIcon";
 import WhatsAppIcon from "./WhatsAppIcon";
+import WhatsAppLink from "./WhatsAppLink";
 
 export default function AddToCartButton({
   art,
@@ -43,15 +44,13 @@ export default function AddToCartButton({
       );
     }
     return (
-      <a
+      <WhatsAppLink
         href={whatsappLink(singleArtworkEnquiryMessage(art))}
-        target="_blank"
-        rel="noopener noreferrer"
         className={`flex w-fit items-center gap-2 rounded-full bg-[#25D366] font-medium text-white transition-opacity hover:opacity-90 ${sizeClasses}`}
       >
         <WhatsAppIcon className={iconSize} />
         Enquire via WhatsApp
-      </a>
+      </WhatsAppLink>
     );
   }
 

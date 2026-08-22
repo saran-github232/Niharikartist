@@ -8,6 +8,7 @@ import FadeImage from "@/components/FadeImage";
 import AvailabilityBadge from "@/components/AvailabilityBadge";
 import SectionHeading from "@/components/SectionHeading";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
+import WhatsAppLink from "@/components/WhatsAppLink";
 
 export default function CartPage() {
   const { items, count, remove } = useCart();
@@ -85,15 +86,13 @@ export default function CartPage() {
 
           <div className="mt-12 flex flex-col items-center gap-4 border-t border-sand/60 pt-10 text-center">
             {whatsappReady ? (
-              <a
+              <WhatsAppLink
                 href={whatsappLink(cartEnquiryMessage(items))}
-                target="_blank"
-                rel="noopener noreferrer"
                 className="flex items-center gap-2 rounded-full bg-[#25D366] px-8 py-3.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
               >
                 <WhatsAppIcon className="size-4" />
                 {enquireLabel}
-              </a>
+              </WhatsAppLink>
             ) : (
               <p className="text-sm text-stone">
                 WhatsApp enquiry is currently unavailable. Please use the contact page.
