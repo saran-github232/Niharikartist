@@ -81,7 +81,12 @@ export default function ArtworkCard({
           src={imageUrl}
           alt={title}
           fill
-          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+          // Every grid this card renders in (shop, gallery, related items)
+          // is 2 columns even on the smallest phones — the old 100vw
+          // fallback told the browser to fetch a full-width image for what's
+          // actually a half-width card, roughly doubling bytes downloaded
+          // per thumbnail on mobile for no visual benefit.
+          sizes="(min-width: 1024px) 33vw, 50vw"
           priority={priority}
           className="object-contain"
         />

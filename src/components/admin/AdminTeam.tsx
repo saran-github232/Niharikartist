@@ -108,7 +108,7 @@ export default function AdminTeam({
 
   return (
     <div className="mx-auto max-w-2xl px-5 py-12 md:px-8">
-      <Link href="/admin" className="text-sm text-stone hover:text-accent">
+      <Link href="/admin" className="text-sm text-ink underline decoration-accent underline-offset-4 hover:text-accent">
         ← Back to dashboard
       </Link>
 

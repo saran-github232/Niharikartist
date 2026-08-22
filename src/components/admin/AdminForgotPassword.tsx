@@ -60,7 +60,7 @@ export default function AdminForgotPassword() {
           </button>
         </form>
       )}
-      <Link href="/admin/login" className="mt-6 text-sm text-stone hover:text-accent">
+      <Link href="/admin/login" className="mt-6 text-sm text-ink underline decoration-accent underline-offset-4 hover:text-accent">
         Back to sign in
       </Link>
     </div>

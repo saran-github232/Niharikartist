@@ -3,6 +3,7 @@ import { Fraunces, Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import PreconnectHints from "@/components/PreconnectHints";
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 import AmbientBackground from "@/components/AmbientBackground";
 import ThemeProvider from "@/components/ThemeProvider";
@@ -68,6 +69,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${fraunces.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-ivory text-ink">
+        <PreconnectHints />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}

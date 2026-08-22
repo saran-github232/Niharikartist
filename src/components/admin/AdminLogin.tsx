@@ -95,10 +95,10 @@ export default function AdminLogin({ configured }: { configured: boolean }) {
         </button>
       </form>
       <div className="mt-6 flex items-center justify-between text-sm">
-        <Link href="/admin/forgot-password" className="text-stone hover:text-accent">
+        <Link href="/admin/forgot-password" className="text-ink underline decoration-accent underline-offset-4 hover:text-accent">
           Forgot password?
         </Link>
-        <Link href="/admin/register" className="text-stone hover:text-accent">
+        <Link href="/admin/register" className="text-ink underline decoration-accent underline-offset-4 hover:text-accent">
           Register admin
         </Link>
       </div>

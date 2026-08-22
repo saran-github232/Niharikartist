@@ -179,7 +179,7 @@ export default function AdminRegister({
       </form>
       <Link
         href={alreadySignedIn ? "/admin/team" : "/admin/login"}
-        className="mt-6 text-sm text-stone hover:text-accent"
+        className="mt-6 text-sm text-ink underline decoration-accent underline-offset-4 hover:text-accent"
       >
         {alreadySignedIn ? "← Back to Team" : "Already have an account? Sign in"}
       </Link>
