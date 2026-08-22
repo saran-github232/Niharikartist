@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import imageLoader from "@/lib/image-loader";
+import { useHoverCapable } from "@/lib/useHoverCapable";
 
 // Adapted from an Originkit/Framer "Spin Image" code component: images travel
 // along a tilted 3D ellipse, depth-scaled and z-stacked so they pass in front
@@ -24,12 +25,21 @@ export default function SpinImageOrbit({
   images: string[];
   className?: string;
 }) {
+  // The `hidden md:block` wrapper the caller uses only checks viewport
+  // *width* — a phone in "Request Desktop Site" mode reports a wide
+  // viewport and slips past that, even though it's still a touchscreen.
+  // This checks real pointer/hover capability instead, which that mode
+  // doesn't spoof, so the orbit only ever runs on an actual mouse/trackpad
+  // device.
+  const hoverCapable = useHoverCapable();
+
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [dims, setDims] = useState({ W: 0, H: 0 });
   const [orbitPhi, setOrbitPhi] = useState(0);
   const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
+    if (!hoverCapable) return;
     const el = containerRef.current;
     if (!el) return;
     const ro = new ResizeObserver((entries) => {
@@ -41,9 +51,10 @@ export default function SpinImageOrbit({
     });
     ro.observe(el);
     return () => ro.disconnect();
-  }, []);
+  }, [hoverCapable]);
 
   useEffect(() => {
+    if (!hoverCapable) return;
     const { W, H } = dims;
     if (!W || !H) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -57,7 +68,7 @@ export default function SpinImageOrbit({
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [dims]);
+  }, [dims, hoverCapable]);
 
   const { W, H } = dims;
   const n = images.length;
@@ -76,6 +87,8 @@ export default function SpinImageOrbit({
     () => images.map((src) => imageLoader({ src, width: textureSize, quality: 70 })),
     [images, textureSize]
   );
+
+  if (!hoverCapable) return null;
 
   const a = ((Math.min(100, ORBIT_WIDTH_PCT) / 100) * W) / 2;
   const b = a * ELLIPSE_RATIO;

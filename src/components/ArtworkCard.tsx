@@ -9,6 +9,13 @@ import { useTilt3D } from "@/lib/useTilt3D";
 import { ensureScrollTrigger } from "@/lib/scrollTrigger";
 import type { ShopArtwork } from "@/data/shop";
 
+// This card renders in grids of a dozen+ at once (shop, gallery, related
+// items). Next.js prefetches every in-viewport Link by default, which means
+// a full grid fires a burst of detail-page prefetch requests immediately —
+// competing with the grid's own images for bandwidth right when it matters
+// most. prefetch={false} here; the detail page is a fast enough server
+// render on click that losing prefetch isn't noticeable, but the images
+// loading first is.
 export default function ArtworkCard({
   title,
   subtitle,
@@ -99,10 +106,10 @@ export default function ArtworkCard({
   if (cartArt) {
     return (
       <div className="group text-left">
-        <Link href={href ?? "#"}>{image}</Link>
+        <Link href={href ?? "#"} prefetch={false}>{image}</Link>
         <div ref={captionRef} className="pt-3">
           <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
-            <Link href={href ?? "#"} className="flex items-center gap-2 hover:text-accent">
+            <Link href={href ?? "#"} prefetch={false} className="flex items-center gap-2 hover:text-accent">
               <h3 className="font-serif text-base text-ink">{title}</h3>
               {price !== undefined && (
                 <span className="shrink-0 text-sm text-accent">
@@ -143,7 +150,7 @@ export default function ArtworkCard({
   }
 
   return (
-    <Link href={href ?? "#"} className={className}>
+    <Link href={href ?? "#"} prefetch={false} className={className}>
       {body}
     </Link>
   );

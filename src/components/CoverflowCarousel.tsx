@@ -32,12 +32,52 @@ export interface CoverflowItem {
 // and a wide landscape active box forced a heavy crop on it — "contain" below
 // keeps every piece fully visible regardless of its own aspect ratio, and
 // this box shape just minimizes how much letterboxing that needs.
-const SIZING = { activeWidth: 360, activeHeight: 440, restWidth: 140, restHeight: 200 };
-const GAP = 22;
+//
+// These numbers are fixed pixels tuned for desktop and are left exactly as
+// they were — nothing below the MOBILE_BREAKPOINT changes them. Below that
+// breakpoint, sizing is scaled down from the *real measured* container width
+// instead (see computeSizing): the old behavior used these same desktop
+// numbers unscaled on phones too, where the 440px-tall active card was both
+// wider and taller than the viewport itself, badly clipped by the
+// container's fixed, much-shorter height and overflow-hidden — the "images
+// fully cutting" bug.
+const DESKTOP_SIZING = { activeWidth: 360, activeHeight: 440, restWidth: 140, restHeight: 200 };
+const DESKTOP_GAP = 22;
+const DESKTOP_CONTAINER_HEIGHT = 380; // matches the old fixed sm:h-[380px]
+const MOBILE_BREAKPOINT = 640; // Tailwind's `sm`
 const RADIUS = 3; // 0 (square) .. 20 (fully rounded)
 const RENDER_RANGE = 6;
 const MOVE_DURATION = 0.4; // seconds per slot
 const DWELL = 1.3; // seconds each card holds centered during autoplay
+
+interface Sizing {
+  activeWidth: number;
+  activeHeight: number;
+  restWidth: number;
+  restHeight: number;
+  gap: number;
+  containerHeight: number;
+}
+
+function computeSizing(containerWidth: number): Sizing {
+  if (containerWidth === 0 || containerWidth >= MOBILE_BREAKPOINT) {
+    return { ...DESKTOP_SIZING, gap: DESKTOP_GAP, containerHeight: DESKTOP_CONTAINER_HEIGHT };
+  }
+  const naturalFootprint = DESKTOP_SIZING.activeWidth + 2 * (DESKTOP_GAP + DESKTOP_SIZING.restWidth);
+  const scale = Math.max(0.42, Math.min(1, (containerWidth * 0.94) / naturalFootprint));
+  const activeHeight = DESKTOP_SIZING.activeHeight * scale;
+  return {
+    activeWidth: DESKTOP_SIZING.activeWidth * scale,
+    activeHeight,
+    restWidth: DESKTOP_SIZING.restWidth * scale,
+    restHeight: DESKTOP_SIZING.restHeight * scale,
+    gap: DESKTOP_GAP * scale,
+    // Sized to the real active card height (plus room for the shadow)
+    // instead of a fixed number shorter than it — this is what stops the
+    // vertical clipping.
+    containerHeight: Math.ceil(activeHeight) + 24,
+  };
+}
 
 function relOf(index: number, pos: number, count: number): number {
   let rel = (((index - pos) % count) + count) % count;
@@ -45,10 +85,10 @@ function relOf(index: number, pos: number, count: number): number {
   return rel;
 }
 
-function xForRel(rel: number, gap: number): number {
+function xForRel(rel: number, sizing: Sizing): number {
   const ar = Math.abs(rel);
-  const c1 = SIZING.activeWidth / 2 + gap + SIZING.restWidth / 2;
-  const pitch = SIZING.restWidth + gap;
+  const c1 = sizing.activeWidth / 2 + sizing.gap + sizing.restWidth / 2;
+  const pitch = sizing.restWidth + sizing.gap;
   const mag = ar <= 1 ? ar * c1 : c1 + (ar - 1) * pitch;
   return (rel < 0 ? -1 : 1) * mag;
 }
@@ -63,6 +103,7 @@ function Card({
   pos,
   count,
   range,
+  sizing,
   onSelect,
 }: {
   item: CoverflowItem;
@@ -70,14 +111,15 @@ function Card({
   pos: MotionValue<number>;
   count: number;
   range: number;
+  sizing: Sizing;
   onSelect: () => void;
 }) {
   const proxiedSrc = useMemo(
-    () => imageLoader({ src: item.src, width: SIZING.activeWidth * 2, quality: 75 }),
+    () => imageLoader({ src: item.src, width: DESKTOP_SIZING.activeWidth * 2, quality: 75 }),
     [item.src]
   );
 
-  const x = useTransform(pos, (p) => xForRel(relOf(index, p, count), GAP));
+  const x = useTransform(pos, (p) => xForRel(relOf(index, p, count), sizing));
   const opacity = useTransform(pos, (p) => {
     const ar = Math.abs(relOf(index, p, count));
     return ar <= range ? 1 : ar >= range + 1 ? 0 : 1 - (ar - range);
@@ -85,16 +127,16 @@ function Card({
   const zIndex = useTransform(pos, (p) => Math.round(1000 - Math.abs(relOf(index, p, count)) * 100));
   const width = useTransform(pos, (p) => {
     const a = blendForRel(relOf(index, p, count));
-    return SIZING.activeWidth + (SIZING.restWidth - SIZING.activeWidth) * a;
+    return sizing.activeWidth + (sizing.restWidth - sizing.activeWidth) * a;
   });
   const height = useTransform(pos, (p) => {
     const a = blendForRel(relOf(index, p, count));
-    return SIZING.activeHeight + (SIZING.restHeight - SIZING.activeHeight) * a;
+    return sizing.activeHeight + (sizing.restHeight - sizing.activeHeight) * a;
   });
   const borderRadius = useTransform(pos, (p) => {
     const a = blendForRel(relOf(index, p, count));
-    const w = SIZING.activeWidth + (SIZING.restWidth - SIZING.activeWidth) * a;
-    const h = SIZING.activeHeight + (SIZING.restHeight - SIZING.activeHeight) * a;
+    const w = sizing.activeWidth + (sizing.restWidth - sizing.activeWidth) * a;
+    const h = sizing.activeHeight + (sizing.restHeight - sizing.activeHeight) * a;
     return (Math.max(0, Math.min(20, RADIUS)) / 20) * (Math.min(w, h) / 2);
   });
 
@@ -185,6 +227,20 @@ export default function CoverflowCarousel({ items }: { items: CoverflowItem[] })
   }, [prefersReducedMotion]);
 
   const [activeIndex, setActiveIndex] = useState(0);
+
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+  useEffect(() => {
+    const el = wrapperRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      const w = entries[0]?.contentRect.width;
+      if (w) setContainerWidth(Math.round(w));
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  const sizing = useMemo(() => computeSizing(containerWidth), [containerWidth]);
 
   // Self-recursive rAF loop: `tick` schedules another `tick`. Referencing the
   // useCallback-produced function from inside its own body (before the const
@@ -281,7 +337,11 @@ export default function CoverflowCarousel({ items }: { items: CoverflowItem[] })
 
   return (
     <div className="select-none">
-      <div className="relative h-[320px] overflow-hidden sm:h-[380px]" style={{ touchAction: "pan-y" }}>
+      <div
+        ref={wrapperRef}
+        className="relative overflow-hidden"
+        style={{ touchAction: "pan-y", height: sizing.containerHeight }}
+      >
         <div className="absolute inset-0" style={{ isolation: "isolate" }}>
           {items.map((item, i) => (
             <Card
@@ -291,6 +351,7 @@ export default function CoverflowCarousel({ items }: { items: CoverflowItem[] })
               pos={pos}
               count={count}
               range={range}
+              sizing={sizing}
               onSelect={() => {
                 if (i === activeIndex && item.href) {
                   router.push(item.href);
