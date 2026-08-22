@@ -101,14 +101,14 @@ export default function CartDrawer() {
               <Link
                 href="/shop"
                 onClick={close}
-                className="flex-1 rounded-full border border-stone/30 px-4 py-2.5 text-center text-sm text-ink hover:border-accent hover:text-accent"
+                className="flex-1 rounded-full border border-stone px-4 py-2.5 text-center text-sm text-ink hover:border-accent hover:text-accent"
               >
                 Continue Exploring
               </Link>
               <Link
                 href="/cart"
                 onClick={close}
-                className="flex-1 rounded-full border border-stone/30 px-4 py-2.5 text-center text-sm text-ink hover:border-accent hover:text-accent"
+                className="flex-1 rounded-full border border-stone px-4 py-2.5 text-center text-sm text-ink hover:border-accent hover:text-accent"
               >
                 View Selection
               </Link>

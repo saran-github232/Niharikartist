@@ -168,7 +168,7 @@ export default function AdminDashboard({
         <button
           type="button"
           onClick={logout}
-          className="rounded-full border border-stone/30 px-4 py-2 text-sm text-ink hover:border-accent hover:text-accent"
+          className="rounded-full border border-stone px-4 py-2 text-sm text-ink hover:border-accent hover:text-accent"
         >
           Log out
         </button>
@@ -292,7 +292,7 @@ export default function AdminDashboard({
                     disabled={deletingSlug === art.slug}
                     aria-label={`Remove ${art.title}`}
                     title="Remove product"
-                    className="flex size-8 items-center justify-center rounded-full border border-red-700/30 text-red-700 transition-colors hover:bg-red-50 disabled:opacity-60"
+                    className="flex size-8 items-center justify-center rounded-full border border-red-700 text-red-700 transition-colors hover:bg-red-50 disabled:opacity-60"
                   >
                     {deletingSlug === art.slug ? (
                       <span className="text-xs">…</span>
@@ -322,7 +322,7 @@ export default function AdminDashboard({
           <button
             type="button"
             onClick={() => setShowAddForm((v) => !v)}
-            className="rounded-full border border-stone/30 px-4 py-1.5 text-sm text-ink hover:border-accent hover:text-accent"
+            className="rounded-full border border-stone px-4 py-1.5 text-sm text-ink hover:border-accent hover:text-accent"
           >
             {showAddForm ? "Cancel" : "New product"}
           </button>

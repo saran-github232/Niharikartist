@@ -28,7 +28,7 @@ export default function AddToCartButton({
         type="button"
         disabled
         aria-disabled="true"
-        className={`cursor-not-allowed rounded-full border border-stone/30 text-stone ${sizeClasses}`}
+        className={`cursor-not-allowed rounded-full border border-stone text-stone ${sizeClasses}`}
       >
         {label}
       </button>

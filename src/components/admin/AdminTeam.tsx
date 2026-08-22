@@ -11,7 +11,7 @@ const MAX_ADMINS = 3;
 function Tag({ variant, children }: { variant: "owner" | "admin" | "pending" | "you"; children: ReactNode }) {
   const styles = {
     owner: "bg-charcoal text-ivory",
-    admin: "border border-stone/30 text-stone",
+    admin: "border border-stone text-stone",
     pending: "bg-accent text-ivory",
     you: "border border-accent text-accent",
   }[variant];
@@ -154,7 +154,7 @@ export default function AdminTeam({
                     type="button"
                     onClick={() => removeAdmin(admin.id, admin.name, true)}
                     disabled={busyId === admin.id}
-                    className="rounded-full border border-red-700/30 px-4 py-1.5 text-xs text-red-700 hover:bg-red-50 disabled:opacity-60"
+                    className="rounded-full border border-red-700 px-4 py-1.5 text-xs text-red-700 hover:bg-red-50 disabled:opacity-60"
                   >
                     Reject
                   </button>
@@ -191,7 +191,7 @@ export default function AdminTeam({
                       <button
                         type="button"
                         onClick={() => setShowChangePassword((v) => !v)}
-                        className="rounded-full border border-stone/30 px-4 py-1.5 text-xs text-ink hover:border-accent hover:text-accent"
+                        className="rounded-full border border-stone px-4 py-1.5 text-xs text-ink hover:border-accent hover:text-accent"
                       >
                         {showChangePassword ? "Cancel" : "Change Password"}
                       </button>
@@ -202,7 +202,7 @@ export default function AdminTeam({
                           type="button"
                           onClick={() => makeOwner(admin.id, admin.name)}
                           disabled={busyId === admin.id}
-                          className="rounded-full border border-stone/30 px-4 py-1.5 text-xs text-ink hover:border-accent hover:text-accent disabled:opacity-60"
+                          className="rounded-full border border-stone px-4 py-1.5 text-xs text-ink hover:border-accent hover:text-accent disabled:opacity-60"
                         >
                           {busyId === admin.id ? "…" : "Make Owner"}
                         </button>
@@ -210,7 +210,7 @@ export default function AdminTeam({
                           type="button"
                           onClick={() => removeAdmin(admin.id, admin.name, false)}
                           disabled={busyId === admin.id}
-                          className="rounded-full border border-red-700/30 px-4 py-1.5 text-xs text-red-700 hover:bg-red-50 disabled:opacity-60"
+                          className="rounded-full border border-red-700 px-4 py-1.5 text-xs text-red-700 hover:bg-red-50 disabled:opacity-60"
                         >
                           {busyId === admin.id ? "Removing…" : "Remove"}
                         </button>
@@ -282,7 +282,7 @@ function ChangePasswordForm({ onDone }: { onDone: () => void }) {
         <button
           type="button"
           onClick={onDone}
-          className="shrink-0 rounded-full border border-stone/30 px-4 py-1.5 text-xs text-ink hover:border-accent hover:text-accent"
+          className="shrink-0 rounded-full border border-stone px-4 py-1.5 text-xs text-ink hover:border-accent hover:text-accent"
         >
           Done
         </button>
