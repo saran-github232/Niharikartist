@@ -1,25 +1,17 @@
-import { promises as fs } from "fs";
-import path from "path";
 import crypto from "crypto";
 import { shopArtworks, type ShopArtwork } from "@/data/shop";
 import { slugify } from "./slug";
+import { kvGet, kvSet } from "./kv";
 
-// Two file-backed JSON stores, both layered onto the existing shopArtworks
-// array at read time rather than replacing it:
-//   - shop-overrides.json: admin-edited {price, available} keyed by slug,
-//     for pieces that already exist in shop.ts.
-//   - shop-additions.json: whole new ShopArtwork entries created via the
-//     admin "Add Product" form (never in shop.ts, which stays the seed
-//     data — nothing here rewrites source files).
-//
-// IMPORTANT: this writes to the local filesystem. That's real, durable
-// storage on a traditional Node server or in local dev, but on typical
-// serverless hosting (Vercel, Netlify functions) the filesystem is
-// ephemeral — a write from one request is not guaranteed to be visible on
-// the next. If this ever deploys to serverless, swap the read/write
-// functions below for a small persistent store (Vercel KV, a database) —
-// nothing else in the admin UI or the shop pages needs to change, they only
-// know about getEffectiveShopArtworks() / setShopOverride() / addShopArtwork().
+// Two stores, both layered onto the existing shopArtworks array at read
+// time rather than replacing it:
+//   - "shop-overrides": admin-edited {price, available} keyed by slug, for
+//     pieces that already exist in shop.ts.
+//   - "shop-additions": whole new ShopArtwork entries created via the admin
+//     "Add Product" form (never in shop.ts, which stays the seed data —
+//     nothing here rewrites source files).
+// Backed by kv.ts: Redis in production (Vercel's filesystem is read-only),
+// local JSON files under data/ in dev.
 export interface ShopOverride {
   price?: number;
   available?: boolean;
@@ -27,31 +19,13 @@ export interface ShopOverride {
   deleted?: boolean;
 }
 
-const OVERRIDES_PATH = path.join(process.cwd(), "data", "shop-overrides.json");
-const ADDITIONS_PATH = path.join(process.cwd(), "data", "shop-additions.json");
-
-async function readJson<T>(filePath: string, fallback: T): Promise<T> {
-  try {
-    const raw = await fs.readFile(filePath, "utf8");
-    const parsed = JSON.parse(raw);
-    return parsed ?? fallback;
-  } catch {
-    return fallback;
-  }
-}
-
-async function writeJson(filePath: string, data: unknown): Promise<void> {
-  await fs.mkdir(path.dirname(filePath), { recursive: true });
-  await fs.writeFile(filePath, JSON.stringify(data, null, 2) + "\n", "utf8");
-}
-
 async function readOverrides(): Promise<Record<string, ShopOverride>> {
-  const data = await readJson<Record<string, ShopOverride>>(OVERRIDES_PATH, {});
+  const data = await kvGet<Record<string, ShopOverride>>("shop-overrides", {});
   return typeof data === "object" && data !== null ? data : {};
 }
 
 async function readAdditions(): Promise<ShopArtwork[]> {
-  const data = await readJson<ShopArtwork[]>(ADDITIONS_PATH, []);
+  const data = await kvGet<ShopArtwork[]>("shop-additions", []);
   return Array.isArray(data) ? data : [];
 }
 
@@ -81,11 +55,11 @@ export async function getEffectiveShopArtwork(slug: string): Promise<ShopArtwork
 export async function deleteShopArtwork(slug: string): Promise<boolean> {
   const additions = await readAdditions();
   if (additions.some((a) => a.slug === slug)) {
-    await writeJson(ADDITIONS_PATH, additions.filter((a) => a.slug !== slug));
+    await kvSet("shop-additions", additions.filter((a) => a.slug !== slug));
     const overrides = await readOverrides();
     if (slug in overrides) {
       delete overrides[slug];
-      await writeJson(OVERRIDES_PATH, overrides);
+      await kvSet("shop-overrides", overrides);
     }
     return true;
   }
@@ -98,7 +72,7 @@ export async function deleteShopArtwork(slug: string): Promise<boolean> {
 export async function setShopOverride(slug: string, patch: ShopOverride): Promise<void> {
   const overrides = await readOverrides();
   overrides[slug] = { ...overrides[slug], ...patch };
-  await writeJson(OVERRIDES_PATH, overrides);
+  await kvSet("shop-overrides", overrides);
 }
 
 /** Applies several {slug, ...patch} entries in one write — the "Save All" path. */
@@ -109,7 +83,7 @@ export async function setShopOverrides(
   for (const { slug, ...patch } of patches) {
     overrides[slug] = { ...overrides[slug], ...patch };
   }
-  await writeJson(OVERRIDES_PATH, overrides);
+  await kvSet("shop-overrides", overrides);
 }
 
 export interface NewShopArtworkInput {
@@ -152,6 +126,6 @@ export async function addShopArtwork(
 
   const additions = await readAdditions();
   additions.push(artwork);
-  await writeJson(ADDITIONS_PATH, additions);
+  await kvSet("shop-additions", additions);
   return { ok: true, artwork };
 }

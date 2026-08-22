@@ -89,12 +89,15 @@ remove products, and manage admin accounts — no database required.
 - **Dashboard stats.** Products, Available, Sold, and total Inventory value (₹,
   summed across Available items) all update live as you edit rows, before you
   even hit Save.
-- **Persistence caveat.** All of this is backed by JSON files under `data/`,
-  written with plain `fs`. That's fully durable in local dev or on a host with a
-  persistent disk. It is **not** reliable on serverless hosting (Vercel, Netlify
-  functions) — the filesystem there is ephemeral, so a write from one request
-  isn't guaranteed to still be there on the next. See the Vercel section below
-  for what that means in practice and how to upgrade past it.
+- **Storage.** `src/lib/kv.ts` is the one place every read/write actually goes
+  through (`adminStore.ts` and `shopOverrides.ts` both call it, nothing else
+  touches storage directly). In local dev it falls back to plain JSON files
+  under `data/` — same as before, nothing to set up. In production it needs
+  `KV_REST_API_URL`/`KV_REST_API_TOKEN` (a Redis store via the Vercel
+  Marketplace) — **required**, not optional: Vercel's serverless filesystem is
+  read-only, so without these, every write (register, approve, save, add
+  product...) fails outright rather than just "not persisting." See the Vercel
+  section below for setup.
 - **Shop → WhatsApp enquiry, not checkout.** The old "Add to Cart" buttons had no
   payment gateway behind them. Product pages now enquire via WhatsApp instead,
   per the brief.
@@ -147,22 +150,22 @@ remove products, and manage admin accounts — no database required.
      Resend, or the sandbox default will do for a demo.
    - `WHATSAPP_NUMBER` isn't an env var — it's set directly in
      `src/data/siteConfig.ts` (see above), so nothing to configure here for it.
-4. **Deploy.** Vercel builds and gives you a `*.vercel.app` URL immediately;
+4. **Add a Redis store — required for the admin panel to work at all.** Vercel's
+   serverless functions have a **read-only** filesystem, so without this every
+   admin write (register, approve, save, add product) fails with a generic
+   error. In your Vercel project: **Storage → Marketplace Database Integrations
+   → search "Upstash"** (or **Redis**) → install → create a new database (free
+   tier is enough) → link it to this project. Vercel injects
+   `KV_REST_API_URL`/`KV_REST_API_TOKEN` automatically — nothing to copy by
+   hand. Redeploy after linking it (Deployments → ⋯ → Redeploy) if you added it
+   after the first deploy.
+5. **Deploy.** Vercel builds and gives you a `*.vercel.app` URL immediately;
    attach a custom domain afterwards under Project Settings → Domains.
-5. **Know the admin-panel limitation on Vercel.** Vercel's serverless functions
-   don't share a persistent filesystem — writes to `data/*.json` (shop edits, new
-   products, new admin accounts) can vanish between requests instead of
-   sticking. This is fine for a client demo of the *flow* (register, sign in,
-   edit, save), but don't rely on data persisting long-term in that
-   configuration. To make it durable in production, swap the `fs`-based
-   read/write calls in `src/lib/adminStore.ts` and `src/lib/shopOverrides.ts` for
-   [Vercel KV](https://vercel.com/docs/storage/vercel-kv) or a small database —
-   every caller (API routes, admin pages) goes through those two files' exported
-   functions, so nothing else needs to change.
 
-Any other Next.js host that gives you a persistent filesystem (a VPS, Railway,
-Render, etc. running `next build && next start`) doesn't have that caveat —
-`data/*.json` just works as real, durable storage there.
+Any other Next.js host with a persistent filesystem (a VPS, Railway, Render,
+etc. running `next build && next start`) doesn't need step 4 at all — leave
+`KV_REST_API_URL` unset there and `src/lib/kv.ts` falls back to `data/*.json`
+files automatically, same as local dev.
 
 ## QA performed
 

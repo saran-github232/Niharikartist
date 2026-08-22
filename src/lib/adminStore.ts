@@ -1,14 +1,7 @@
-import { promises as fs } from "fs";
-import path from "path";
 import crypto from "crypto";
 import { hashPassword } from "./password";
+import { kvGet, kvSet } from "./kv";
 
-// Same file-backed-JSON approach as shopOverrides.ts, and the same caveat
-// applies: durable in local dev / on a persistent-disk host, NOT reliable on
-// serverless (Vercel/Netlify functions have an ephemeral filesystem). Admin
-// accounts are exactly the kind of data where that matters most — if this
-// deploys to serverless, swap read/write here for a real database before
-// relying on registration/login actually sticking between requests.
 export const MAX_ADMINS = 3;
 
 export interface AdminAccount {
@@ -30,23 +23,17 @@ export interface AdminAccount {
 
 export type PublicAdmin = Omit<AdminAccount, "passwordHash">;
 
-const FILE_PATH = path.join(process.cwd(), "data", "admins.json");
-
 async function readAdmins(): Promise<AdminAccount[]> {
-  try {
-    const raw = await fs.readFile(FILE_PATH, "utf8");
-    const parsed = JSON.parse(raw);
-    // Accounts written before the approval system existed have no `status`
-    // field — treat them as already-approved rather than losing them.
-    return Array.isArray(parsed) ? parsed.map((a) => ({ status: "approved", ...a })) : [];
-  } catch {
-    return [];
-  }
+  const admins = await kvGet<Array<Partial<AdminAccount>>>("admins", []);
+  // Accounts written before the approval system existed have no `status`
+  // field — treat them as already-approved rather than losing them.
+  return Array.isArray(admins)
+    ? admins.map((a) => ({ status: "approved", ...a }) as AdminAccount)
+    : [];
 }
 
 async function writeAdmins(admins: AdminAccount[]): Promise<void> {
-  await fs.mkdir(path.dirname(FILE_PATH), { recursive: true });
-  await fs.writeFile(FILE_PATH, JSON.stringify(admins, null, 2) + "\n", "utf8");
+  await kvSet("admins", admins);
 }
 
 export function toPublicAdmin(a: AdminAccount): PublicAdmin {
