@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type ReactNode } from "react";
+import { useState, type FormEvent, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import type { PublicAdmin } from "@/lib/adminStore";
+import PasswordInput from "./PasswordInput";
 
 const MAX_ADMINS = 3;
 
@@ -35,6 +36,7 @@ export default function AdminTeam({
   const [ownerId, setOwnerId] = useState(initialOwnerId);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showChangePassword, setShowChangePassword] = useState(false);
   const isOwner = currentAdmin.id === ownerId;
 
   const pending = adminList.filter((a) => a.status === "pending");
@@ -168,39 +170,57 @@ export default function AdminTeam({
         <ul className="mt-3 divide-y divide-sand/60 rounded-lg border border-sand bg-ivory">
           {approved.map((admin) => {
             const adminIsOwner = admin.id === ownerId;
+            const isSelf = admin.id === currentAdmin.id;
             return (
-              <li key={admin.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="min-w-0">
-                  <p className="flex flex-wrap items-center gap-2 truncate text-sm font-medium text-ink">
-                    {admin.name}
-                    <Tag variant={adminIsOwner ? "owner" : "admin"}>{adminIsOwner ? "Owner" : "Admin"}</Tag>
-                    {admin.id === currentAdmin.id && <Tag variant="you">You</Tag>}
-                  </p>
-                  <p className="truncate text-xs text-stone">{admin.email}</p>
-                  <p className="text-xs text-stone">
-                    Joined {new Date(admin.createdAt).toLocaleDateString("en-IN", { dateStyle: "medium" })}
-                  </p>
+              <li key={admin.id} className="p-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="min-w-0">
+                    <p className="flex flex-wrap items-center gap-2 truncate text-sm font-medium text-ink">
+                      {admin.name}
+                      <Tag variant={adminIsOwner ? "owner" : "admin"}>{adminIsOwner ? "Owner" : "Admin"}</Tag>
+                      {isSelf && <Tag variant="you">You</Tag>}
+                    </p>
+                    <p className="truncate text-xs text-stone">{admin.email}</p>
+                    <p className="text-xs text-stone">
+                      Joined {new Date(admin.createdAt).toLocaleDateString("en-IN", { dateStyle: "medium" })}
+                    </p>
+                  </div>
+
+                  <div className="flex shrink-0 gap-2 sm:self-center">
+                    {isSelf && (
+                      <button
+                        type="button"
+                        onClick={() => setShowChangePassword((v) => !v)}
+                        className="rounded-full border border-stone/30 px-4 py-1.5 text-xs text-ink hover:border-accent hover:text-accent"
+                      >
+                        {showChangePassword ? "Cancel" : "Change Password"}
+                      </button>
+                    )}
+                    {isOwner && !isSelf && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => makeOwner(admin.id, admin.name)}
+                          disabled={busyId === admin.id}
+                          className="rounded-full border border-stone/30 px-4 py-1.5 text-xs text-ink hover:border-accent hover:text-accent disabled:opacity-60"
+                        >
+                          {busyId === admin.id ? "…" : "Make Owner"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => removeAdmin(admin.id, admin.name, false)}
+                          disabled={busyId === admin.id}
+                          className="rounded-full border border-red-700/30 px-4 py-1.5 text-xs text-red-700 hover:bg-red-50 disabled:opacity-60"
+                        >
+                          {busyId === admin.id ? "Removing…" : "Remove"}
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
 
-                {isOwner && admin.id !== currentAdmin.id && (
-                  <div className="flex shrink-0 gap-2 sm:self-center">
-                    <button
-                      type="button"
-                      onClick={() => makeOwner(admin.id, admin.name)}
-                      disabled={busyId === admin.id}
-                      className="rounded-full border border-stone/30 px-4 py-1.5 text-xs text-ink hover:border-accent hover:text-accent disabled:opacity-60"
-                    >
-                      {busyId === admin.id ? "…" : "Make Owner"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => removeAdmin(admin.id, admin.name, false)}
-                      disabled={busyId === admin.id}
-                      className="rounded-full border border-red-700/30 px-4 py-1.5 text-xs text-red-700 hover:bg-red-50 disabled:opacity-60"
-                    >
-                      {busyId === admin.id ? "Removing…" : "Remove"}
-                    </button>
-                  </div>
+                {isSelf && showChangePassword && (
+                  <ChangePasswordForm onDone={() => setShowChangePassword(false)} />
                 )}
               </li>
             );
@@ -217,5 +237,86 @@ export default function AdminTeam({
         </Link>
       )}
     </div>
+  );
+}
+
+function ChangePasswordForm({ onDone }: { onDone: () => void }) {
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        setError(data?.error ?? "Couldn't change your password.");
+        return;
+      }
+      setDone(true);
+      setTimeout(onDone, 1200);
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (done) {
+    return <p className="mt-3 text-sm text-accent">Password changed.</p>;
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="mt-4 space-y-3 border-t border-sand/60 pt-4">
+      <div>
+        <label htmlFor="current-password" className="text-xs text-stone">
+          Current password
+        </label>
+        <PasswordInput
+          id="current-password"
+          required
+          autoComplete="current-password"
+          value={currentPassword}
+          onChange={(e) => setCurrentPassword(e.target.value)}
+          className="mt-1 text-sm"
+        />
+      </div>
+      <div>
+        <label htmlFor="new-password" className="text-xs text-stone">
+          New password
+        </label>
+        <PasswordInput
+          id="new-password"
+          required
+          minLength={8}
+          autoComplete="new-password"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          className="mt-1 text-sm"
+        />
+        <p className="mt-1 text-xs text-stone">At least 8 characters.</p>
+      </div>
+      {error && (
+        <p role="alert" className="text-xs text-red-700">
+          {error}
+        </p>
+      )}
+      <button
+        type="submit"
+        disabled={loading}
+        className="rounded-full bg-charcoal px-5 py-2 text-xs text-ivory transition-colors hover:bg-accent disabled:opacity-60"
+      >
+        {loading ? "Saving…" : "Save new password"}
+      </button>
+    </form>
   );
 }
